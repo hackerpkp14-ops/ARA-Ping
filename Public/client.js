@@ -85,6 +85,8 @@ async function openChat(user) {
   messages.innerHTML = "";
 
   msgs.forEach(renderMessage);
+
+  messages.scrollTop = messages.scrollHeight;
 }
 
 sendBtn.onclick = () => {

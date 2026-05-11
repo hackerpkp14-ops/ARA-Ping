@@ -110,11 +110,19 @@ app.get("/messages/:a/:b", async (req, res) => {
 
 io.on("connection", socket => {
   socket.on("message", async msg => {
-    const saved = await Message.create(msg);
-    io.emit("message", saved);
+    try {
+      const saved = await Message.create({
+        from: msg.from,
+        to: msg.to,
+        text: msg.text
+      });
+
+      io.emit("message", saved);
+    } catch (err) {
+      console.error("MESSAGE ERROR:", err);
+    }
   });
 });
-
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
