@@ -1,0 +1,16 @@
+body{margin:0;font-family:system-ui;background:#0b141a;color:#e9edef}
+.hidden{display:none}
+.screen{display:flex;height:100vh;align-items:center;justify-content:center}
+.card{background:#202c33;padding:28px;border-radius:16px;width:320px;display:flex;flex-direction:column;gap:10px}
+input,button{padding:12px;border:none;border-radius:10px}
+#app{display:flex;height:100vh}
+#users{width:320px;background:#111b21;padding:12px;overflow:auto}
+main{flex:1;display:flex;flex-direction:column}
+#chatTitle{padding:16px;background:#202c33}
+#messages{flex:1;padding:16px;overflow:auto}
+.composer{display:flex;padding:12px;background:#202c33;gap:8px}
+.composer input{flex:1}
+.user{padding:12px;border-bottom:1px solid #202c33;cursor:pointer}
+.bubble{background:#202c33;padding:10px 14px;border-radius:12px;max-width:60%;margin:8px 0}
+.me{margin-left:auto;background:#005c4b}
+@media(max-width:768px){#users{width:110px}}

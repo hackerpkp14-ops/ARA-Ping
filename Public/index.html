@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARA Ping</title>
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#111b21;
+  color:white;
+}
+#auth{
+  width:360px;
+  margin:90px auto;
+  background:#202c33;
+  padding:30px;
+  border-radius:14px;
+}
+input{
+  width:100%;
+  box-sizing:border-box;
+  padding:12px;
+  margin-top:12px;
+  border:none;
+  border-radius:8px;
+}
+button{
+  width:100%;
+  padding:12px;
+  margin-top:12px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+#app{
+  display:none;
+  height:100vh;
+}
+#sidebar{
+  width:300px;
+  background:#202c33;
+  overflow:auto;
+}
+.user{
+  padding:16px;
+  cursor:pointer;
+  border-bottom:1px solid #2a3942;
+}
+.user:hover{
+  background:#2a3942;
+}
+#chat{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+#chatHeader{
+  padding:16px;
+  background:#202c33;
+}
+#messages{
+  flex:1;
+  padding:20px;
+  overflow:auto;
+}
+.msg{
+  background:#005c4b;
+  padding:10px 14px;
+  border-radius:10px;
+  margin:8px 0;
+  width:max-content;
+  max-width:65%;
+}
+.mine{
+  margin-left:auto;
+}
+#sendBar{
+  display:flex;
+  padding:12px;
+  background:#202c33;
+}
+#sendBar input{
+  flex:1;
+  margin-right:8px;
+  margin-top:0;
+}
+#sendBar button{
+  width:90px;
+  margin-top:0;
+}
+</style>
+</head>
+<body>
+
+<div id="auth">
+  <h2>ARA Ping</h2>
+  <input id="username" placeholder="Username">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="signup()">Sign Up</button>
+  <button onclick="login()">Login</button>
+</div>
+
+<div id="app">
+  <div id="sidebar"></div>
+
+  <div id="chat">
+    <div id="chatHeader">Select chat</div>
+    <div id="messages"></div>
+
+    <div id="sendBar">
+      <input id="messageInput" placeholder="Type a message">
+      <button onclick="send()">Send</button>
+    </div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+
+let me = "";
+let current = "";
+
+async function signup(){
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  const res = await fetch("/signup", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ username, password })
+  });
+
+  const data = await res.json();
+  alert(data.ok ? "Signup successful" : data.error);
+}
+
+async function login(){
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  const res = await fetch("/login", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ username, password })
+  });
+
+  const data = await res.json();
+
+  if(!data.ok){
+    return alert(data.error);
+  }
+
+  me = username;
+
+  document.getElementById("auth").style.display = "none";
+  document.getElementById("app").style.display = "flex";
+
+  loadUsers();
+}
+
+async function loadUsers(){
+  const res = await fetch("/users/" + me);
+  const users = await res.json();
+
+  const sidebar = document.getElementById("sidebar");
+  sidebar.innerHTML = "";
+
+  users.forEach(u => {
+    const div = document.createElement("div");
+    div.className = "user";
+    div.textContent = u.username;
+    div.onclick = () => openChat(u.username);
+    sidebar.appendChild(div);
+  });
+}
+
+async function openChat(user){
+  current = user;
+  document.getElementById("chatHeader").textContent = user;
+
+  const res = await fetch(`/messages/${me}/${user}`);
+  const msgs = await res.json();
+
+  const box = document.getElementById("messages");
+  box.innerHTML = "";
+
+  msgs.forEach(renderMessage);
+}
+
+function renderMessage(m){
+  if(
+    (m.from === me && m.to === current) ||
+    (m.from === current && m.to === me)
+  ){
+    const div = document.createElement("div");
+    div.className = "msg";
+    if(m.from === me) div.classList.add("mine");
+    div.textContent = m.text;
+    document.getElementById("messages").appendChild(div);
+  }
+}
+
+function send(){
+  const input = document.getElementById("messageInput");
+  const text = input.value.trim();
+
+  if(!text || !current) return;
+
+  socket.emit("private-message", {
+    from: me,
+    to: current,
+    text
+  });
+
+  input.value = "";
+}
+
+socket.on("private-message", msg => {
+  renderMessage(msg);
+});
+</script>
+
+</body>
+</html>
