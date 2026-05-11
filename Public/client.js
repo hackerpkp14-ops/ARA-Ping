@@ -98,13 +98,14 @@ sendBtn.onclick = () => {
 
   socket.emit("message", payload);
 
-  renderMessage(payload);
-
   msg.value = "";
 };
-
+  
 socket.on("message", data => {
-  if (data.from === selected || data.to === selected) {
+  if (
+    (data.from === me && data.to === selected) ||
+    (data.from === selected && data.to === me)
+  ) {
     renderMessage(data);
   }
 });
