@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 const { Server } = require("socket.io");
 
 const app = express();
-const path = require("path");
 
 app.use(express.static(path.join(__dirname, "Public")));
 
