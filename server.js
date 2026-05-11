@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 const { Server } = require("socket.io");
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, "Public")));
 
@@ -19,7 +21,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.log(err));
+  .catch(err => console.error("Mongo error:", err));
 
 const UserSchema = new mongoose.Schema({
   username: { type: String, unique: true, required: true },
@@ -58,23 +60,32 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
+app.post("/signup", async (req, res) => {
+  try {
+    const { username, password } = req.body;
 
-  const user = await User.findOne({ username, password });
+    if (!username || !password) {
+      return res.status(400).json({ error: "All fields required" });
+    }
 
-  if (!user) {
-    return res.status(400).json({ error: "Invalid credentials" });
+    const existing = await User.findOne({ username: username.trim() });
+
+    if (existing) {
+      return res.status(400).json({ error: "User already exists" });
+    }
+
+    await User.create({
+      username: username.trim(),
+      password: password.trim()
+    });
+
+    res.json({ ok: true });
+
+  } catch (err) {
+    console.error("SIGNUP ERROR:", err);
+    res.status(500).json({ error: "Signup failed" });
   }
-
-  res.json({ ok: true });
 });
-
-app.get("/users/:me", async (req, res) => {
-  const users = await User.find({ username: { $ne: req.params.me } });
-  res.json(users);
-});
-
 app.get("/messages/:a/:b", async (req, res) => {
   const { a, b } = req.params;
 
