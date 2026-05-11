@@ -5,6 +5,13 @@ const mongoose = require("mongoose");
 const { Server } = require("socket.io");
 
 const app = express();
+const path = require("path");
+
+app.use(express.static(path.join(__dirname, "Public")));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "Public", "index.html"));
+});
 const server = http.createServer(app);
 const io = new Server(server);
 
