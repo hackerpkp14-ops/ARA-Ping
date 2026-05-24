@@ -5,12 +5,14 @@ let selected = "";
 
 const usernameEl = document.getElementById("username");
 const passwordEl = document.getElementById("password");
+
 const auth = document.getElementById("auth");
 const app = document.getElementById("app");
 
 const usersBox = document.getElementById("users");
 const chatTitle = document.getElementById("chatTitle");
 const messages = document.getElementById("messages");
+
 const msg = document.getElementById("msg");
 const sendBtn = document.getElementById("sendBtn");
 
@@ -27,23 +29,32 @@ async function post(url, body) {
 }
 
 document.getElementById("signupBtn").onclick = async () => {
+
   const username = usernameEl.value.trim();
   const password = passwordEl.value.trim();
 
-  const r = await post("/signup", { username, password });
+  const r = await post("/signup", {
+    username,
+    password
+  });
 
-  if (r.ok) {
-    alert("Signup successful");
-  } else {
+  if (!r.ok) {
     alert(r.error || "Signup failed");
+    return;
   }
+
+  alert("Signup successful");
 };
 
 document.getElementById("loginBtn").onclick = async () => {
+
   const username = usernameEl.value.trim();
   const password = passwordEl.value.trim();
 
-  const r = await post("/login", { username, password });
+  const r = await post("/login", {
+    username,
+    password
+  });
 
   if (!r.ok) {
     alert(r.error || "Login failed");
@@ -55,32 +66,39 @@ document.getElementById("loginBtn").onclick = async () => {
   auth.classList.add("hidden");
   app.classList.remove("hidden");
 
-  socket.emit("join", me);
-
   loadUsers();
 };
 
 async function loadUsers() {
-  const users = await fetch(`/users/${me}`).then(r => r.json());
+
+  const users = await fetch(`/users/${me}`)
+    .then(r => r.json());
 
   usersBox.innerHTML = "";
 
   users.forEach(u => {
+
     const div = document.createElement("div");
+
     div.className = "user";
     div.innerText = u.username;
 
     div.onclick = () => openChat(u.username);
 
     usersBox.appendChild(div);
+
   });
+
 }
 
 async function openChat(user) {
+
   selected = user;
+
   chatTitle.innerText = user;
 
-  const msgs = await fetch(`/messages/${me}/${user}`).then(r => r.json());
+  const msgs = await fetch(`/messages/${me}/${user}`)
+    .then(r => r.json());
 
   messages.innerHTML = "";
 
@@ -91,7 +109,12 @@ async function openChat(user) {
 
 sendBtn.onclick = () => {
 
-  if (!selected || !msg.value.trim()) return;
+  if (!selected) {
+    alert("Select a user");
+    return;
+  }
+
+  if (!msg.value.trim()) return;
 
   const payload = {
     from: me,
@@ -106,34 +129,28 @@ sendBtn.onclick = () => {
 
 socket.on("message", data => {
 
-  const valid =
+  const belongs =
     (data.from === me && data.to === selected) ||
     (data.from === selected && data.to === me);
 
-  if (!valid) return;
+  if (!belongs) return;
 
   renderMessage(data);
 
-});
-  
-socket.on("message", data => {
-  renderMessage(data);
 });
 
 function renderMessage(m) {
+
   const div = document.createElement("div");
-  div.className = m.from === me ? "bubble me" : "bubble";
+
+  div.className =
+    m.from === me
+      ? "bubble me"
+      : "bubble";
+
   div.textContent = m.text;
 
- const last = messages.lastElementChild;
+  messages.appendChild(div);
 
-if (
-  last &&
-  last.textContent === m.text &&
-  last.className === div.className
-) {
-  return;
+  messages.scrollTop = messages.scrollHeight;
 }
-
-messages.appendChild(div);
-messages.scrollTop = messages.scrollHeight;}
