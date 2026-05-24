@@ -90,6 +90,7 @@ async function openChat(user) {
 }
 
 sendBtn.onclick = () => {
+
   if (!selected || !msg.value.trim()) return;
 
   const payload = {
@@ -98,12 +99,22 @@ sendBtn.onclick = () => {
     text: msg.value.trim()
   };
 
-  renderMessage(payload);
-
   socket.emit("message", payload);
 
   msg.value = "";
 };
+
+socket.on("message", data => {
+
+  const valid =
+    (data.from === me && data.to === selected) ||
+    (data.from === selected && data.to === me);
+
+  if (!valid) return;
+
+  renderMessage(data);
+
+});
   
 socket.on("message", data => {
   renderMessage(data);
@@ -114,6 +125,15 @@ function renderMessage(m) {
   div.className = m.from === me ? "bubble me" : "bubble";
   div.textContent = m.text;
 
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
+ const last = messages.lastElementChild;
+
+if (
+  last &&
+  last.textContent === m.text &&
+  last.className === div.className
+) {
+  return;
 }
+
+messages.appendChild(div);
+messages.scrollTop = messages.scrollHeight;}

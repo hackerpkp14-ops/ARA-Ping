@@ -109,19 +109,26 @@ app.get("/messages/:a/:b", async (req, res) => {
 });
 
 io.on("connection", socket => {
-  socket.on("message", async msg => {
+
+  socket.on("join", username => {
+    socket.username = username;
+  });
+
+  socket.on("message", async data => {
     try {
       const saved = await Message.create({
-        from: msg.from,
-        to: msg.to,
-        text: msg.text
+        from: data.from,
+        to: data.to,
+        text: data.text
       });
 
       io.emit("message", saved);
+
     } catch (err) {
-      console.error("MESSAGE ERROR:", err);
+      console.log(err);
     }
   });
+
 });
 const PORT = process.env.PORT || 3000;
 
