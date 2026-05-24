@@ -108,13 +108,7 @@ async function openChat(user) {
 }
 
 sendBtn.onclick = () => {
-
-  if (!selected) {
-    alert("Select a user");
-    return;
-  }
-
-  if (!msg.value.trim()) return;
+  if (!selected || !msg.value.trim()) return;
 
   const payload = {
     from: me,
@@ -122,10 +116,17 @@ sendBtn.onclick = () => {
     text: msg.value.trim()
   };
 
+  renderMessage(payload);
+
   socket.emit("message", payload);
 
   msg.value = "";
 };
+
+  socket.emit("message", payload);
+
+  msg.value = "";
+;
 
 ssocket.on("message", data => {
 
