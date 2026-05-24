@@ -115,19 +115,22 @@ io.on("connection", socket => {
   });
 
   socket.on("message", async data => {
-    try {
-      const saved = await Message.create({
-        from: data.from,
-        to: data.to,
-        text: data.text
-      });
 
-      io.emit("message", saved);
+  console.log("MESSAGE RECEIVED:", data);
 
-    } catch (err) {
-      console.log(err);
-    }
-  });
+  try {
+    const saved = await Message.create({
+      from: data.from,
+      to: data.to,
+      text: data.text
+    });
+
+    io.emit("message", saved);
+
+  } catch (err) {
+    console.log(err);
+  }
+});
 
 });
 const PORT = process.env.PORT || 3000;

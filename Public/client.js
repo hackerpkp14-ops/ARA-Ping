@@ -127,7 +127,9 @@ sendBtn.onclick = () => {
   msg.value = "";
 };
 
-socket.on("message", data => {
+ssocket.on("message", data => {
+
+  console.log("SOCKET MESSAGE:", data);
 
   const belongs =
     (data.from === me && data.to === selected) ||
