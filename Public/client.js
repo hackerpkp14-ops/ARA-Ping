@@ -38,12 +38,11 @@ document.getElementById("signupBtn").onclick = async () => {
     password
   });
 
-  if (!r.ok) {
+  if (r.ok) {
+    alert("Signup successful");
+  } else {
     alert(r.error || "Signup failed");
-    return;
   }
-
-  alert("Signup successful");
 };
 
 document.getElementById("loginBtn").onclick = async () => {
@@ -56,15 +55,19 @@ document.getElementById("loginBtn").onclick = async () => {
     password
   });
 
+  console.log("LOGIN RESPONSE:", r);
+
   if (!r.ok) {
     alert(r.error || "Login failed");
     return;
   }
 
-  me = username;
+  me = r.username;
 
   auth.classList.add("hidden");
   app.classList.remove("hidden");
+
+  socket.emit("join", me);
 
   loadUsers();
 };
@@ -88,7 +91,6 @@ async function loadUsers() {
     usersBox.appendChild(div);
 
   });
-
 }
 
 async function openChat(user) {
@@ -103,11 +105,10 @@ async function openChat(user) {
   messages.innerHTML = "";
 
   msgs.forEach(renderMessage);
-
-  messages.scrollTop = messages.scrollHeight;
 }
 
 sendBtn.onclick = () => {
+
   if (!selected || !msg.value.trim()) return;
 
   const payload = {
@@ -123,12 +124,7 @@ sendBtn.onclick = () => {
   msg.value = "";
 };
 
-  socket.emit("message", payload);
-
-  msg.value = "";
-;
-
-ssocket.on("message", data => {
+socket.on("message", data => {
 
   console.log("SOCKET MESSAGE:", data);
 
@@ -139,7 +135,6 @@ ssocket.on("message", data => {
   if (!belongs) return;
 
   renderMessage(data);
-
 });
 
 function renderMessage(m) {
