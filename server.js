@@ -1,195 +1,230 @@
 const express = require("express");
 const http = require("http");
-const path = require("path");
 const mongoose = require("mongoose");
+const socketio = require("socket.io");
+const path = require("path");
 const multer = require("multer");
-const { Server } = require("socket.io");
+const fs = require("fs");
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = socketio(server);
 
 app.use(express.json());
-app.use(express.urlencoded({ extended:true }));
+app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname,"Public")));
-app.use("/uploads",express.static("uploads"));
+app.use(express.static(path.join(__dirname, "Public")));
+app.use("/uploads", express.static("uploads"));
+
+if (!fs.existsSync("uploads")) {
+  fs.mkdirSync("uploads");
+}
+
+/* ======================
+   MONGODB
+====================== */
 
 mongoose.connect(process.env.MONGO_URI)
-.then(()=>console.log("MongoDB Connected"))
-.catch(err=>console.log(err));
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.log(err));
+
+/* ======================
+   MODELS
+====================== */
+
+const UserSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    unique: true
+  },
+  password: String
+});
+
+const MessageSchema = new mongoose.Schema({
+  from: String,
+  to: String,
+  text: String,
+  image: String,
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+const User = mongoose.model("User", UserSchema);
+const Message = mongoose.model("Message", MessageSchema);
+
+/* ======================
+   MULTER IMAGE STORAGE
+====================== */
 
 const storage = multer.diskStorage({
 
-  destination:(req,file,cb)=>{
-    cb(null,"uploads/");
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
   },
 
-  filename:(req,file,cb)=>{
+  filename: (req, file, cb) => {
     cb(
       null,
-      Date.now() + "-" + file.originalname
+      Date.now() +
+      "-" +
+      file.originalname
     );
   }
 
 });
 
-const upload = multer({ storage });
-
-const UserSchema = new mongoose.Schema({
-  username:{
-    type:String,
-    unique:true
-  },
-  password:String
+const upload = multer({
+  storage
 });
 
-const MessageSchema = new mongoose.Schema({
+/* ======================
+   ROUTES
+====================== */
 
-  from:String,
-
-  to:String,
-
-  text:String,
-
-  image:String,
-
-  createdAt:{
-    type:Date,
-    default:Date.now
-  }
-
-});
-
-const User = mongoose.model("User",UserSchema);
-const Message = mongoose.model("Message",MessageSchema);
-
-app.get("/",(req,res)=>{
+app.get("/", (req, res) => {
   res.sendFile(
-    path.join(__dirname,"Public","index.html")
+    path.join(__dirname, "Public", "index.html")
   );
 });
 
-app.post("/signup",async(req,res)=>{
+/* SIGNUP */
 
-  try{
+app.post("/signup", async (req, res) => {
 
-    const { username,password } = req.body;
+  try {
 
-    const existing =
-    await User.findOne({
-      username:username.trim()
-    });
+    const username =
+      req.body.username.trim();
 
-    if(existing){
+    const password =
+      req.body.password.trim();
 
+    if (!username || !password) {
       return res.json({
-        ok:false,
-        error:"Username already exists"
+        ok: false,
+        error: "Fill all fields"
       });
+    }
 
+    const exists =
+      await User.findOne({ username });
+
+    if (exists) {
+      return res.json({
+        ok: false,
+        error: "Username already exists"
+      });
     }
 
     await User.create({
-      username:username.trim(),
-      password:password.trim()
+      username,
+      password
     });
 
-    res.json({ ok:true });
+    res.json({
+      ok: true
+    });
 
-  }catch(err){
+  } catch (err) {
 
     console.log(err);
 
     res.json({
-      ok:false,
-      error:"Signup failed"
+      ok: false,
+      error: "Signup failed"
     });
 
   }
 
 });
 
-app.post("/login",async(req,res)=>{
+/* LOGIN */
 
-  try{
+app.post("/login", async (req, res) => {
 
-    const { username,password } = req.body;
+  try {
 
-    const user =
-    await User.findOne({
-      username:username.trim(),
-      password:password.trim()
+    const username =
+      req.body.username.trim();
+
+    const password =
+      req.body.password.trim();
+
+    const user = await User.findOne({
+      username,
+      password
     });
 
-    if(!user){
-
+    if (!user) {
       return res.json({
-        ok:false,
-        error:"Invalid credentials"
+        ok: false,
+        error: "Invalid credentials"
       });
-
     }
 
     res.json({
-      ok:true,
-      username:user.username
+      ok: true,
+      username: user.username
     });
 
-  }catch(err){
+  } catch (err) {
 
     console.log(err);
 
     res.json({
-      ok:false,
-      error:"Login failed"
+      ok: false,
+      error: "Login failed"
     });
 
   }
 
 });
 
-app.get("/search/:username",async(req,res)=>{
+/* SEARCH USERS */
 
-  const user =
-  await User.findOne({
-    username:req.params.username
+app.get("/search/:username", async (req, res) => {
+
+  const username = req.params.username;
+
+  const users = await User.find({
+    username: {
+      $regex: username,
+      $options: "i"
+    }
   });
 
-  if(!user){
-    return res.json([]);
-  }
-
-  res.json([user]);
+  res.json(users);
 
 });
 
-app.get("/recent/:me",async(req,res)=>{
+/* GET CHATS */
+
+app.get("/chats/:me", async (req, res) => {
 
   const me = req.params.me;
 
-  const msgs =
-  await Message.find({
-    $or:[
-      { from:me },
-      { to:me }
+  const msgs = await Message.find({
+    $or: [
+      { from: me },
+      { to: me }
     ]
-  }).sort({ createdAt:-1 });
+  }).sort({ createdAt: -1 });
 
   const users = [];
 
-  msgs.forEach(m=>{
+  msgs.forEach(m => {
 
     const other =
-    m.from === me ? m.to : m.from;
+      m.from === me ? m.to : m.from;
 
-    if(!users.find(
-      x=>x.username === other
-    )){
+    if (!users.find(u => u.username === other)) {
 
       users.push({
-        username:other,
-        text:m.text || "📷 Image"
+        username: other,
+        lastMessage:
+          m.text || "📷 Image"
       });
 
     }
@@ -200,56 +235,88 @@ app.get("/recent/:me",async(req,res)=>{
 
 });
 
-app.get("/messages/:a/:b",async(req,res)=>{
+/* GET MESSAGES */
 
-  const msgs =
-  await Message.find({
+app.get("/messages/:a/:b", async (req, res) => {
 
-    $or:[
-      {
-        from:req.params.a,
-        to:req.params.b
-      },
-      {
-        from:req.params.b,
-        to:req.params.a
-      }
+  const a = req.params.a;
+  const b = req.params.b;
+
+  const msgs = await Message.find({
+
+    $or: [
+      { from: a, to: b },
+      { from: b, to: a }
     ]
 
-  }).sort({ createdAt:1 });
+  }).sort({ createdAt: 1 });
 
   res.json(msgs);
 
 });
 
+/* IMAGE UPLOAD */
+
 app.post(
   "/upload",
   upload.single("image"),
-  async(req,res)=>{
+  (req, res) => {
 
     res.json({
-      image:"/uploads/" + req.file.filename
+      image:
+        "/uploads/" +
+        req.file.filename
     });
 
   }
 );
 
-io.on("connection",(socket)=>{
+/* ======================
+   SOCKET
+====================== */
 
-  socket.on("message",async(data)=>{
+io.on("connection", socket => {
 
-    const saved =
-    await Message.create(data);
+  socket.on(
+    "message",
+    async data => {
 
-    io.emit("message",saved);
+      try {
 
-  });
+        const saved =
+          await Message.create({
+
+            from: data.from,
+            to: data.to,
+            text: data.text || "",
+            image: data.image || ""
+
+          });
+
+        io.emit("message", saved);
+
+      } catch (err) {
+
+        console.log(err);
+
+      }
+
+    }
+  );
 
 });
 
-const PORT =
-process.env.PORT || 3000;
+/* ======================
+   SERVER
+====================== */
 
-server.listen(PORT,()=>{
-  console.log("Running on " + PORT);
+const PORT =
+  process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+
+  console.log(
+    "Server running on " + PORT
+  );
+
 });
