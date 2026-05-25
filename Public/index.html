@@ -1,124 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
 <title>ARA Ping</title>
 
-<style>
-
-body{
-  margin:0;
-  font-family:Arial;
-  background:#111b21;
-  color:white;
-}
-
-#auth{
-  width:350px;
-  margin:80px auto;
-  background:#202c33;
-  padding:30px;
-  border-radius:14px;
-}
-
-input{
-  width:100%;
-  padding:12px;
-  margin-top:12px;
-  border:none;
-  border-radius:8px;
-  box-sizing:border-box;
-}
-
-button{
-  width:100%;
-  padding:12px;
-  margin-top:12px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-#app{
-  display:none;
-  height:100vh;
-}
-
-#sidebar{
-  width:300px;
-  background:#202c33;
-  overflow:auto;
-}
-
-.user{
-  padding:16px;
-  border-bottom:1px solid #2a3942;
-  cursor:pointer;
-}
-
-.user:hover{
-  background:#2a3942;
-}
-
-#chat{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-}
-
-#chatHeader{
-  padding:16px;
-  background:#202c33;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-#messages{
-  flex:1;
-  overflow:auto;
-  padding:20px;
-}
-
-.msg{
-  background:#005c4b;
-  width:max-content;
-  max-width:70%;
-  padding:10px 14px;
-  border-radius:12px;
-  margin:8px 0;
-}
-
-.mine{
-  margin-left:auto;
-}
-
-#sendBar{
-  display:flex;
-  padding:10px;
-  background:#202c33;
-}
-
-#sendBar input{
-  flex:1;
-  margin:0;
-  margin-right:10px;
-}
-
-#sendBar button{
-  width:100px;
-  margin:0;
-}
-
-#logoutBtn{
-  width:100px;
-}
-
-</style>
+<link rel="stylesheet" href="style.css">
 
 </head>
 
@@ -126,15 +20,42 @@ button{
 
 <div id="auth">
 
-  <h2>ARA Ping</h2>
+  <div id="logoBox">
 
-  <input id="username" placeholder="Username">
+    <div id="logo">
+      A
+    </div>
 
-  <input id="password" type="password" placeholder="Password">
+    <div>
 
-  <button onclick="signup()">Sign Up</button>
+      <h1>ARA Ping</h1>
 
-  <button onclick="login()">Login</button>
+      <small>
+        Private Messaging
+      </small>
+
+    </div>
+
+  </div>
+
+  <input
+    id="username"
+    placeholder="Username"
+  >
+
+  <input
+    id="password"
+    type="password"
+    placeholder="Password"
+  >
+
+  <button id="signupBtn">
+    Sign Up
+  </button>
+
+  <button id="loginBtn">
+    Login
+  </button>
 
 </div>
 
@@ -142,14 +63,24 @@ button{
 
   <div id="sidebar">
 
-    <div style="padding:10px">
+    <div id="sidebarTop">
+
+      <h2>ARA Ping</h2>
+
+      <button id="logoutBtn">
+        Logout
+      </button>
+
+    </div>
+
+    <div id="searchBox">
 
       <input
         id="searchInput"
         placeholder="Search username"
       >
 
-      <button onclick="searchUser()">
+      <button id="searchBtn">
         Search
       </button>
 
@@ -162,15 +93,7 @@ button{
   <div id="chat">
 
     <div id="chatHeader">
-
-      <span id="chatName">
-        Select chat
-      </span>
-
-      <button id="logoutBtn" onclick="logout()">
-        Logout
-      </button>
-
+      Select Chat
     </div>
 
     <div id="messages"></div>
@@ -182,7 +105,19 @@ button{
         placeholder="Type message"
       >
 
-      <button onclick="sendMessage()">
+      <label id="imageBtn">
+
+        📷
+
+        <input
+          type="file"
+          id="imageInput"
+          hidden
+        >
+
+      </label>
+
+      <button id="sendBtn">
         Send
       </button>
 
@@ -194,252 +129,8 @@ button{
 
 <script src="/socket.io/socket.io.js"></script>
 
-<script>
-
-const socket = io();
-
-let me = "";
-let currentUser = "";
-
-const auth = document.getElementById("auth");
-const app = document.getElementById("app");
-
-const usersBox = document.getElementById("users");
-
-const messages = document.getElementById("messages");
-
-const messageInput = document.getElementById("messageInput");
-
-const chatName = document.getElementById("chatName");
-
-window.onload = ()=>{
-
-  const saved = localStorage.getItem("ara-user");
-
-  if(saved){
-
-    me = saved;
-
-    auth.style.display = "none";
-
-    app.style.display = "flex";
-
-  }
-
-};
-
-async function signup(){
-
-  const username =
-  document.getElementById("username")
-  .value
-  .trim();
-
-  const password =
-  document.getElementById("password")
-  .value
-  .trim();
-
-  const res = await fetch("/signup",{
-
-    method:"POST",
-
-    headers:{
-      "Content-Type":"application/json"
-    },
-
-    body:JSON.stringify({
-      username,
-      password
-    })
-
-  });
-
-  const data = await res.json();
-
-  if(data.ok){
-    alert("Signup successful");
-  }else{
-    alert(data.error);
-  }
-
-}
-
-async function login(){
-
-  const username =
-  document.getElementById("username")
-  .value
-  .trim();
-
-  const password =
-  document.getElementById("password")
-  .value
-  .trim();
-
-  const res = await fetch("/login",{
-
-    method:"POST",
-
-    headers:{
-      "Content-Type":"application/json"
-    },
-
-    body:JSON.stringify({
-      username,
-      password
-    })
-
-  });
-
-  const data = await res.json();
-
-  if(!data.ok){
-    return alert(data.error);
-  }
-
-  me = data.username;
-
-  localStorage.setItem(
-    "ara-user",
-    me
-  );
-
-  auth.style.display = "none";
-
-  app.style.display = "flex";
-
-}
-
-function logout(){
-
-  localStorage.removeItem("ara-user");
-
-  location.reload();
-
-}
-
-async function searchUser(){
-
-  const username =
-  document.getElementById("searchInput")
-  .value
-  .trim();
-
-  const res =
-  await fetch("/search/" + username);
-
-  const users =
-  await res.json();
-
-  usersBox.innerHTML = "";
-
-  users.forEach(user=>{
-
-    if(user.username === me){
-      return;
-    }
-
-    const div =
-    document.createElement("div");
-
-    div.className = "user";
-
-    div.innerText = user.username;
-
-    div.onclick = ()=>{
-      openChat(user.username);
-    };
-
-    usersBox.appendChild(div);
-
-  });
-
-}
-
-async function openChat(user){
-
-  currentUser = user;
-
-  chatName.innerText = user;
-
-  const res =
-  await fetch(`/messages/${me}/${user}`);
-
-  const data =
-  await res.json();
-
-  messages.innerHTML = "";
-
-  data.forEach(renderMessage);
-
-}
-
-function renderMessage(m){
-
-  if(
-    (m.from === me && m.to === currentUser)
-    ||
-    (m.from === currentUser && m.to === me)
-  ){
-
-    const div =
-    document.createElement("div");
-
-    div.className = "msg";
-
-    if(m.from === me){
-      div.classList.add("mine");
-    }
-
-    div.innerText = m.text;
-
-    messages.appendChild(div);
-
-    messages.scrollTop =
-    messages.scrollHeight;
-
-  }
-
-}
-
-function sendMessage(){
-
-  const text =
-  messageInput.value.trim();
-
-  if(!text || !currentUser){
-    return;
-  }
-
-  socket.emit("message",{
-    from:me,
-    to:currentUser,
-    text:text
-  });
-
-  messageInput.value = "";
-
-}
-
-socket.on("message",(data)=>{
-
-  renderMessage(data);
-
-});
-
-messageInput.addEventListener(
-  "keypress",
-  (e)=>{
-
-    if(e.key === "Enter"){
-      sendMessage();
-    }
-
-  }
-);
-
-</script>
+<script src="client.js"></script>
 
 </body>
+
 </html>

@@ -1,154 +1,423 @@
 const socket = io();
 
 let me = "";
-let selected = "";
+let currentUser = "";
 
-const usernameEl = document.getElementById("username");
-const passwordEl = document.getElementById("password");
+const auth =
+document.getElementById("auth");
 
-const auth = document.getElementById("auth");
-const app = document.getElementById("app");
+const app =
+document.getElementById("app");
 
-const usersBox = document.getElementById("users");
-const chatTitle = document.getElementById("chatTitle");
-const messages = document.getElementById("messages");
+const usersBox =
+document.getElementById("users");
 
-const msg = document.getElementById("msg");
-const sendBtn = document.getElementById("sendBtn");
+const messages =
+document.getElementById("messages");
 
-async function post(url, body) {
-  const r = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
+const chatHeader =
+document.getElementById("chatHeader");
+
+const messageInput =
+document.getElementById("messageInput");
+
+const imageInput =
+document.getElementById("imageInput");
+
+window.onload = ()=>{
+
+  const saved =
+  localStorage.getItem("ara-user");
+
+  if(saved){
+
+    me = saved;
+
+    auth.style.display = "none";
+
+    app.style.display = "flex";
+
+    loadRecentChats();
+
+  }
+
+};
+
+async function post(url,data){
+
+  const res = await fetch(url,{
+
+    method:"POST",
+
+    headers:{
+      "Content-Type":"application/json"
     },
-    body: JSON.stringify(body)
+
+    body:JSON.stringify(data)
+
   });
 
-  return await r.json();
+  return await res.json();
+
 }
 
-document.getElementById("signupBtn").onclick = async () => {
+document
+.getElementById("signupBtn")
+.onclick = async()=>{
 
-  const username = usernameEl.value.trim();
-  const password = passwordEl.value.trim();
+  const username =
+  document
+  .getElementById("username")
+  .value
+  .trim();
 
-  const r = await post("/signup", {
+  const password =
+  document
+  .getElementById("password")
+  .value
+  .trim();
+
+  const data =
+  await post("/signup",{
     username,
     password
   });
 
-  if (r.ok) {
+  if(data.ok){
+
     alert("Signup successful");
-  } else {
-    alert(r.error || "Signup failed");
+
+  }else{
+
+    alert(data.error);
+
   }
+
 };
 
-document.getElementById("loginBtn").onclick = async () => {
+document
+.getElementById("loginBtn")
+.onclick = async()=>{
 
-  const username = usernameEl.value.trim();
-  const password = passwordEl.value.trim();
+  const username =
+  document
+  .getElementById("username")
+  .value
+  .trim();
 
-  const r = await post("/login", {
+  const password =
+  document
+  .getElementById("password")
+  .value
+  .trim();
+
+  const data =
+  await post("/login",{
     username,
     password
   });
 
-  console.log("LOGIN RESPONSE:", r);
+  if(!data.ok){
 
-  if (!r.ok) {
-    alert(r.error || "Login failed");
-    return;
+    return alert(data.error);
+
   }
 
-  me = r.username;
+  me = data.username;
 
-  auth.classList.add("hidden");
-  app.classList.remove("hidden");
+  localStorage.setItem(
+    "ara-user",
+    me
+  );
 
-  socket.emit("join", me);
+  auth.style.display = "none";
 
-  loadUsers();
+  app.style.display = "flex";
+
+  loadRecentChats();
+
 };
 
-async function loadUsers() {
+document
+.getElementById("logoutBtn")
+.onclick = ()=>{
 
-  const users = await fetch(`/users/${me}`)
-    .then(r => r.json());
+  localStorage.removeItem(
+    "ara-user"
+  );
+
+  location.reload();
+
+};
+
+async function loadRecentChats(){
+
+  const res =
+  await fetch("/recent/" + me);
+
+  const users =
+  await res.json();
 
   usersBox.innerHTML = "";
 
-  users.forEach(u => {
+  users.forEach(addUserToSidebar);
 
-    const div = document.createElement("div");
-
-    div.className = "user";
-    div.innerText = u.username;
-
-    div.onclick = () => openChat(u.username);
-
-    usersBox.appendChild(div);
-
-  });
 }
 
-async function openChat(user) {
+function addUserToSidebar(user){
 
-  selected = user;
+  const already =
+  [...usersBox.children]
+  .find(x=>
+    x.dataset.username === user.username
+  );
 
-  chatTitle.innerText = user;
+  if(already) return;
 
-  const msgs = await fetch(`/messages/${me}/${user}`)
-    .then(r => r.json());
+  const div =
+  document.createElement("div");
+
+  div.className = "user";
+
+  div.dataset.username =
+  user.username;
+
+  div.innerHTML = `
+    <div class="userName">
+      ${user.username}
+    </div>
+
+    <div class="lastMsg">
+      ${user.text || ""}
+    </div>
+  `;
+
+  div.onclick = ()=>{
+    openChat(user.username);
+  };
+
+  usersBox.prepend(div);
+
+}
+
+document
+.getElementById("searchBtn")
+.onclick = async()=>{
+
+  const username =
+  document
+  .getElementById("searchInput")
+  .value
+  .trim();
+
+  if(!username) return;
+
+  if(username === me){
+
+    return alert(
+      "Cannot search yourself"
+    );
+
+  }
+
+  const res =
+  await fetch("/search/" + username);
+
+  const users =
+  await res.json();
+
+  if(users.length === 0){
+
+    return alert("User not found");
+
+  }
+
+  addUserToSidebar({
+    username:users[0].username,
+    text:"Start conversation"
+  });
+
+};
+
+async function openChat(user){
+
+  currentUser = user;
+
+  chatHeader.innerText = user;
+
+  const res =
+  await fetch(
+    `/messages/${me}/${user}`
+  );
+
+  const data =
+  await res.json();
 
   messages.innerHTML = "";
 
-  msgs.forEach(renderMessage);
+  data.forEach(renderMessage);
+
 }
 
-sendBtn.onclick = () => {
+function renderMessage(m){
 
-  if (!selected || !msg.value.trim()) return;
+  if(
+    (m.from === me &&
+    m.to === currentUser)
+    ||
+    (m.from === currentUser &&
+    m.to === me)
+  ){
+
+    const div =
+    document.createElement("div");
+
+    div.className = "msg";
+
+    if(m.from === me){
+      div.classList.add("mine");
+    }
+
+    const time =
+    new Date(m.createdAt)
+    .toLocaleTimeString([],{
+      hour:"2-digit",
+      minute:"2-digit"
+    });
+
+    div.innerHTML = `
+      ${
+        m.text
+        ?
+        `<div>${m.text}</div>`
+        :
+        ""
+      }
+
+      ${
+        m.image
+        ?
+        `<img src="${m.image}">`
+        :
+        ""
+      }
+
+      <span class="time">
+        ${time}
+      </span>
+    `;
+
+    messages.appendChild(div);
+
+    messages.scrollTop =
+    messages.scrollHeight;
+
+  }
+
+}
+
+document
+.getElementById("sendBtn")
+.onclick = sendMessage;
+
+async function sendMessage(){
+
+  const text =
+  messageInput.value.trim();
+
+  if(!text || !currentUser){
+    return;
+  }
 
   const payload = {
-    from: me,
-    to: selected,
-    text: msg.value.trim()
+
+    from:me,
+
+    to:currentUser,
+
+    text
+
   };
 
-  renderMessage(payload);
+  socket.emit("message",payload);
 
-  socket.emit("message", payload);
+  addUserToSidebar({
+    username:currentUser,
+    text
+  });
 
-  msg.value = "";
-};
+  messageInput.value = "";
 
-socket.on("message", data => {
+}
 
-  console.log("SOCKET MESSAGE:", data);
+messageInput
+.addEventListener(
+  "keypress",
+  (e)=>{
 
-  const belongs =
-    (data.from === me && data.to === selected) ||
-    (data.from === selected && data.to === me);
+    if(e.key === "Enter"){
 
-  if (!belongs) return;
+      sendMessage();
+
+    }
+
+  }
+);
+
+imageInput
+.addEventListener(
+  "change",
+  async()=>{
+
+    const file =
+    imageInput.files[0];
+
+    if(!file || !currentUser){
+      return;
+    }
+
+    const form =
+    new FormData();
+
+    form.append("image",file);
+
+    const res =
+    await fetch("/upload",{
+
+      method:"POST",
+
+      body:form
+
+    });
+
+    const data =
+    await res.json();
+
+    socket.emit("message",{
+
+      from:me,
+
+      to:currentUser,
+
+      image:data.image
+
+    });
+
+  }
+);
+
+socket.on("message",(data)=>{
 
   renderMessage(data);
+
+  addUserToSidebar({
+    username:
+    data.from === me
+    ? data.to
+    : data.from,
+
+    text:
+    data.text || "📷 Image"
+  });
+
 });
-
-function renderMessage(m) {
-
-  const div = document.createElement("div");
-
-  div.className =
-    m.from === me
-      ? "bubble me"
-      : "bubble";
-
-  div.textContent = m.text;
-
-  messages.appendChild(div);
-
-  messages.scrollTop = messages.scrollHeight;
-}
