@@ -2,70 +2,60 @@
 <html lang="en">
 
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ARA Ping</title>
 
-<meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
->
-
-<title>ARA Ping</title>
-
-<link rel="stylesheet" href="style.css">
-
+  <link rel="stylesheet" href="style.css"/>
 </head>
 
 <body>
 
+<!-- AUTH -->
+
 <div id="auth">
 
-  <div id="logoBox">
-
-    <div id="logo">
-      A
-    </div>
-
-    <div>
-
-      <h1>ARA Ping</h1>
-
-      <small>
-        Private Messaging
-      </small>
-
-    </div>
-
-  </div>
+  <h1>ARA Ping</h1>
+  <p>Private Messaging</p>
 
   <input
     id="username"
     placeholder="Username"
-  >
+  />
 
   <input
     id="password"
     type="password"
     placeholder="Password"
-  >
+  />
 
-  <button id="signupBtn">
-    Sign Up
-  </button>
+  <div class="authBtns">
 
-  <button id="loginBtn">
-    Login
-  </button>
+    <button id="signupBtn">
+      Sign Up
+    </button>
+
+    <button id="loginBtn">
+      Login
+    </button>
+
+  </div>
 
 </div>
 
-<div id="app">
+<!-- APP -->
+
+<div id="app" style="display:none;">
+
+  <!-- SIDEBAR -->
 
   <div id="sidebar">
 
     <div id="sidebarTop">
 
-      <h2>ARA Ping</h2>
+      <div class="logo">
+        ARA Ping
+      </div>
 
       <button id="logoutBtn">
         Logout
@@ -73,12 +63,12 @@
 
     </div>
 
-    <div id="searchBox">
+    <div id="searchArea">
 
       <input
         id="searchInput"
         placeholder="Search username"
-      >
+      />
 
       <button id="searchBtn">
         Search
@@ -90,7 +80,9 @@
 
   </div>
 
-  <div id="chat">
+  <!-- CHAT -->
+
+  <div id="chatArea">
 
     <div id="chatHeader">
       Select Chat
@@ -103,17 +95,17 @@
       <input
         id="messageInput"
         placeholder="Type message"
-      >
+      />
 
-      <label id="imageBtn">
+      <label id="imageLabel">
 
         📷
 
         <input
           type="file"
           id="imageInput"
-          hidden
-        >
+          accept="image/*"
+        />
 
       </label>
 
@@ -128,9 +120,7 @@
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
-
 <script src="client.js"></script>
 
 </body>
-
 </html>
