@@ -243,7 +243,11 @@ async function openChat(user){
 
   currentUser = user;
 
-  chatHeader.innerText = user;
+  document.getElementById("chatName").innerText = user;
+
+document
+.getElementById("app")
+.classList.add("chat-open");
 
   const res =
   await fetch(
@@ -421,3 +425,12 @@ socket.on("message",(data)=>{
   });
 
 });
+document
+.getElementById("backBtn")
+.onclick = () => {
+
+  document
+  .getElementById("app")
+  .classList.remove("chat-open");
+
+};
