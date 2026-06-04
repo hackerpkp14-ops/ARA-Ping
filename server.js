@@ -37,14 +37,36 @@ const UserSchema = new mongoose.Schema({
     type: String,
     unique: true
   },
-  password: String
+  password: String,
+
+  profilePic: {
+    type: String,
+    default: ""
+  },
+
+  lastSeen: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 const MessageSchema = new mongoose.Schema({
   from: String,
   to: String,
+
   text: String,
   image: String,
+
+  replyTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: null
+  },
+
+  deletedForEveryone: {
+    type: Boolean,
+    default: false
+  },
+
   createdAt: {
     type: Date,
     default: Date.now
@@ -198,6 +220,30 @@ app.get("/search/:username", async (req, res) => {
   res.json(users);
 
 });
+app.get(
+  "/profile/:username",
+  async (req, res) => {
+
+    const user =
+      await User.findOne({
+        username:
+          req.params.username
+      });
+
+    if (!user) {
+      return res.json({
+        ok: false
+      });
+    }
+
+    res.json({
+      ok: true,
+      username: user.username,
+      profilePic: user.profilePic
+    });
+
+  }
+);
 
 /* GET CHATS */
 
@@ -214,22 +260,29 @@ app.get("/chats/:me", async (req, res) => {
 
   const users = [];
 
-  msgs.forEach(m => {
+ for (const m of msgs) {
 
-    const other =
-      m.from === me ? m.to : m.from;
+  const other =
+    m.from === me ? m.to : m.from;
 
-    if (!users.find(u => u.username === other)) {
+  if (!users.find(u => u.username === other)) {
 
-      users.push({
-        username: other,
-        lastMessage:
-          m.text || "📷 Image"
+    const profileUser =
+      await User.findOne({
+        username: other
       });
 
-    }
+    users.push({
+      username: other,
+      profilePic:
+        profileUser?.profilePic || "",
+      lastMessage:
+        m.text || "📷 Image"
+    });
 
-  });
+  }
+
+}
 
   res.json(users);
 
@@ -267,6 +320,43 @@ app.post(
         "/uploads/" +
         req.file.filename
     });
+
+  }
+);
+app.post(
+  "/upload-profile",
+  upload.single("image"),
+  async (req, res) => {
+
+    try {
+
+      const username = req.body.username;
+
+      const image =
+        "/uploads/" +
+        req.file.filename;
+
+      await User.updateOne(
+        { username },
+        {
+          profilePic: image
+        }
+      );
+
+      res.json({
+        ok: true,
+        image
+      });
+
+    } catch (err) {
+
+      console.log(err);
+
+      res.json({
+        ok: false
+      });
+
+    }
 
   }
 );

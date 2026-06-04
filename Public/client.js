@@ -24,6 +24,33 @@ document.getElementById("messageInput");
 const imageInput =
 document.getElementById("imageInput");
 
+const profileBtn =
+document.getElementById("profileBtn");
+
+const profileModal =
+document.getElementById("profileModal");
+
+const closeProfileBtn =
+document.getElementById("closeProfileBtn");
+
+const profilePicInput =
+document.getElementById("profilePicInput");
+
+const profileAvatar =
+document.getElementById("profileAvatar");
+
+const profileUsername =
+document.getElementById("profileUsername");
+
+const searchOpenBtn =
+document.getElementById("searchOpenBtn");
+
+const searchModal =
+document.getElementById("searchModal");
+
+const closeSearchBtn =
+document.getElementById("closeSearchBtn");
+
 window.onload = ()=>{
 
   const saved =
@@ -153,7 +180,7 @@ document
 async function loadRecentChats(){
 
   const res =
-  await fetch("/recent/" + me);
+ await fetch("/chats/" + me);
 
   const users =
   await res.json();
@@ -188,7 +215,7 @@ function addUserToSidebar(user){
     </div>
 
     <div class="lastMsg">
-      ${user.text || ""}
+      ${user.lastMessage || user.text || ""}
     </div>
   `;
 
@@ -434,3 +461,99 @@ document
   .classList.remove("chat-open");
 
 };
+searchOpenBtn.onclick = () => {
+
+  searchModal.style.display =
+  "flex";
+
+};
+
+closeSearchBtn.onclick = () => {
+
+  searchModal.style.display =
+  "none";
+
+};
+profileBtn.onclick = async () => {
+
+  profileModal.style.display =
+  "flex";
+
+  const res =
+  await fetch("/profile/" + me);
+
+  const data =
+  await res.json();
+
+  profileUsername.innerText =
+  data.username;
+
+  if(data.profilePic){
+
+    profileAvatar.innerHTML =
+    `<img src="${data.profilePic}" style="width:100%;height:100%;border-radius:50%;">`;
+
+  }else{
+
+    profileAvatar.innerText =
+    data.username[0]
+    .toUpperCase();
+
+  }
+
+};
+closeProfileBtn.onclick = () => {
+
+  profileModal.style.display =
+  "none";
+
+};
+profilePicInput.addEventListener(
+  "change",
+  async () => {
+
+    const file =
+    profilePicInput.files[0];
+
+    if(!file) return;
+
+    const form =
+    new FormData();
+
+    form.append(
+      "image",
+      file
+    );
+
+    form.append(
+      "username",
+      me
+    );
+
+    const res =
+    await fetch(
+      "/upload-profile",
+      {
+        method:"POST",
+        body:form
+      }
+    );
+
+    const data =
+    await res.json();
+
+    if(data.ok){
+
+      profileAvatar.innerHTML =
+      `<img src="${data.image}" style="width:100%;height:100%;border-radius:50%;">`;
+
+      alert(
+        "Profile updated"
+      );
+
+      loadRecentChats();
+
+    }
+
+  }
+);

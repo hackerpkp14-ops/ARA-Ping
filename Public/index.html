@@ -2,11 +2,11 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ARA Ping</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARA Ping</title>
 
-  <link rel="stylesheet" href="style.css"/>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -21,13 +21,13 @@
   <input
     id="username"
     placeholder="Username"
-  />
+  >
 
   <input
     id="password"
     type="password"
     placeholder="Password"
-  />
+  >
 
   <div class="authBtns">
 
@@ -57,44 +57,63 @@
         ARA Ping
       </div>
 
-      <button id="logoutBtn">
-        Logout
-      </button>
+      <div class="topActions">
+
+        <button id="profileBtn">
+          👤
+        </button>
+
+        <button id="searchOpenBtn">
+          🔍
+        </button>
+
+        <button id="logoutBtn">
+          🚪
+        </button>
+
+      </div>
 
     </div>
 
-    <div id="searchArea">
-
-      <input
-        id="searchInput"
-        placeholder="Search username"
-      />
-
-      <button id="searchBtn">
-        Search
-      </button>
-
+    <div class="sectionTitle">
+      Recent Chats
     </div>
 
     <div id="users"></div>
 
   </div>
 
-  <!-- CHAT -->
+  <!-- CHAT AREA -->
 
   <div id="chatArea">
 
-  <div id="chatHeader">
+    <div id="chatHeader">
 
-  <button id="backBtn">
-    ←
-  </button>
+      <button id="backBtn">
+        ←
+      </button>
 
-  <span id="chatName">
-    Select Chat
-  </span>
+      <div id="chatUserInfo">
 
-</div>
+        <div id="chatAvatar">
+          ?
+        </div>
+
+        <div>
+
+          <div id="chatName">
+            Select Chat
+          </div>
+
+          <div id="chatStatus">
+            Offline
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
 
     <div id="messages"></div>
 
@@ -103,7 +122,7 @@
       <input
         id="messageInput"
         placeholder="Type message"
-      />
+      >
 
       <label id="imageLabel">
 
@@ -113,7 +132,7 @@
           type="file"
           id="imageInput"
           accept="image/*"
-        />
+        >
 
       </label>
 
@@ -122,6 +141,75 @@
       </button>
 
     </div>
+
+  </div>
+
+</div>
+
+<!-- SEARCH MODAL -->
+
+<div id="searchModal" class="modal">
+
+  <div class="modalBox">
+
+    <h2>
+      Search User
+    </h2>
+
+    <input
+      id="searchInput"
+      placeholder="Enter username"
+    >
+
+    <div class="modalBtns">
+
+      <button id="searchBtn">
+        Search
+      </button>
+
+      <button id="closeSearchBtn">
+        Close
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- PROFILE MODAL -->
+
+<div id="profileModal" class="modal">
+
+  <div class="modalBox">
+
+    <h2>
+      My Profile
+    </h2>
+
+    <div id="profileAvatar">
+      R
+    </div>
+
+    <div id="profileUsername">
+      Username
+    </div>
+
+    <label class="uploadBtn">
+
+      Change Photo
+
+      <input
+        type="file"
+        id="profilePicInput"
+        accept="image/*"
+      >
+
+    </label>
+
+    <button id="closeProfileBtn">
+      Close
+    </button>
 
   </div>
 
