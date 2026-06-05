@@ -437,40 +437,6 @@ document
 
 };
 
-
-  const res =
-  await fetch("/profile/" + me);
-
-  const data =
-  await res.json();
-
-  profileUsername.innerText =
-  data.username;
-
-  if(data.profilePic){
-
-    profileAvatar.innerHTML =
-    `<img src="${data.profilePic}" style="width:100%;height:100%;border-radius:50%;">`;
-
-  }else{
-
-    profileAvatar.innerText =
-    data.username[0]
-    .toUpperCase();
-
-  }
-
-;
-closeProfileBtn.onclick = () => {
-
-  profileModal.style.display =
-  "none";
-
-};
-profilePicInput.addEventListener(
-  "change",
-  async () => {
-
     const file =
     profilePicInput.files[0];
 
@@ -514,26 +480,54 @@ profilePicInput.addEventListener(
 
     }
 
-  }
-);
+socket.on("message",(data)=>{
+
+  renderMessage(data);
+
+  addUserToSidebar({
+    username:
+    data.from === me
+    ? data.to
+    : data.from,
+
+    text:
+    data.text || "📷 Image"
+  });
+
+});
+
+document
+.getElementById("backBtn")
+.onclick = () => {
+
+  document
+  .getElementById("app")
+  .classList.remove("chat-open");
+
+};
+
 const settingsBtn =
 document.getElementById("settingsBtn");
 
 const settingsModal =
 document.getElementById("settingsModal");
 
-settingsBtn.onclick = () => {
+if(settingsBtn && settingsModal){
 
-  settingsModal.classList.add("show");
+  settingsBtn.onclick = () => {
 
-};
+    settingsModal.classList.add("show");
 
-settingsModal.onclick = (e)=>{
+  };
 
-  if(e.target === settingsModal){
+  settingsModal.onclick = (e)=>{
 
-    settingsModal.classList.remove("show");
+    if(e.target === settingsModal){
 
-  }
+      settingsModal.classList.remove("show");
 
-};
+    }
+
+  };
+
+}s
