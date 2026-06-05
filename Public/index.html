@@ -53,26 +53,26 @@
 
     <div id="sidebarTop">
 
-      <div class="logo">
-        ARA Ping
-      </div>
+  <div class="topHeader">
 
-      <div class="topActions">
+    <h1>ARA Ping</h1>
 
-        <button id="profileBtn">
-          👤
-        </button>
+    <button id="settingsBtn">
+      ⚙️
+    </button>
 
-        <button id="searchOpenBtn">
-          🔍
-        </button>
+  </div>
 
-        <button id="logoutBtn">
-          🚪
-        </button>
+  <div id="searchContainer">
 
-      </div>
+    <input
+      id="searchInput"
+      placeholder="Search username..."
+    />
 
+  </div>
+
+</div>
     </div>
 
     <div class="sectionTitle">
@@ -217,6 +217,32 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="client.js"></script>
+
+<div id="settingsModal" class="modal">
+
+  <div class="modalContent">
+
+    <img
+      id="profilePreview"
+      class="profilePic"
+      src=""
+    />
+
+    <h3 id="profileName"></h3>
+
+    <input
+      type="file"
+      id="profilePicInput"
+      accept="image/*"
+    />
+
+    <button id="logoutBtn">
+      Logout
+    </button>
+
+  </div>
+
+</div>
 
 </body>
 </html>

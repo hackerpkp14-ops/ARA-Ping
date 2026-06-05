@@ -513,3 +513,65 @@ body{
   }
 
 }
+.topHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.topHeader h1{
+  font-size:42px;
+}
+
+#settingsBtn{
+  width:50px;
+  height:50px;
+  border:none;
+  border-radius:50%;
+  background:#2a3942;
+  color:white;
+  font-size:22px;
+  cursor:pointer;
+}
+
+#searchContainer{
+  margin-top:20px;
+}
+
+#searchInput{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  outline:none;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modalContent{
+  width:320px;
+  background:#202c33;
+  padding:25px;
+  border-radius:20px;
+  text-align:center;
+}
+
+.profilePic{
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  object-fit:cover;
+  margin-bottom:15px;
+}

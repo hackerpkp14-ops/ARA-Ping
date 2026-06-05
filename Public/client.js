@@ -557,3 +557,24 @@ profilePicInput.addEventListener(
 
   }
 );
+const settingsBtn =
+document.getElementById("settingsBtn");
+
+const settingsModal =
+document.getElementById("settingsModal");
+
+settingsBtn.onclick = () => {
+
+  settingsModal.classList.add("show");
+
+};
+
+settingsModal.onclick = (e)=>{
+
+  if(e.target === settingsModal){
+
+    settingsModal.classList.remove("show");
+
+  }
+
+};
