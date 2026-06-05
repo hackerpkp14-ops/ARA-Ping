@@ -476,7 +476,7 @@ document
 
 const settingsBtn =
 document.getElementById("settingsBtn");
-addUse
+
 const settingsModal =
 document.getElementById("settingsModal");
 
