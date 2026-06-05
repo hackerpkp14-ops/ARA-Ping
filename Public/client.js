@@ -199,6 +199,10 @@ function addUserToSidebar(user){
   };
 
   usersBox.prepend(div);
+  div.onclick = ()=>{
+  console.log("CHAT CLICKED:", user.username);
+  openChat(user.username);
+};
 
 }
 
@@ -243,6 +247,10 @@ document
 
 async function openChat(user){
 
+  async function openChat(user){
+
+  console.log("OPENCHAT RUNNING:", user);
+
   currentUser = user;
 
   document.getElementById("chatName").innerText = user;
@@ -255,6 +263,8 @@ document
   await fetch(
     `/messages/${me}/${user}`
   );
+
+  console.log("FETCH STATUS:", res.status);
 
   const data =
   await res.json();
@@ -442,7 +452,7 @@ socket.on("message",(data)=>{
 
   renderMessage(data);
 
-  addUserToSidebar({
+  rToSidebar({
     username:
     data.from === me
     ? data.to
@@ -466,7 +476,7 @@ document
 
 const settingsBtn =
 document.getElementById("settingsBtn");
-
+addUse
 const settingsModal =
 document.getElementById("settingsModal");
 
@@ -485,7 +495,6 @@ if(settingsBtn && settingsModal){
       settingsModal.classList.remove("show");
 
     }
-
-  };
-
+  }
+}
 }
