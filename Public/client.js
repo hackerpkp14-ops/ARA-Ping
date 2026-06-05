@@ -247,7 +247,33 @@ document
 
 async function openChat(user){
 
-  async function openChat(user){
+console.log("OPENCHAT RUNNING:", user);
+
+  currentUser = user;
+
+  document.getElementById("chatName").innerText = user;
+
+  document
+  .getElementById("app")
+  .classList.add("chat-open");
+
+  const res =
+  await fetch(
+    `/messages/${me}/${user}`
+  );
+
+  console.log("FETCH STATUS:", res.status);
+
+  const data =
+  await res.json();
+
+  console.log("MESSAGES:", data);
+
+  messages.innerHTML = "";
+
+  data.forEach(renderMessage);
+
+}
 
   console.log("OPENCHAT RUNNING:", user);
 
@@ -273,7 +299,6 @@ document
 
   data.forEach(renderMessage);
 
-}
 
 function renderMessage(m){
 
@@ -496,5 +521,4 @@ if(settingsBtn && settingsModal){
 
     }
   }
-}
 }
