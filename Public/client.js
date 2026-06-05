@@ -24,32 +24,7 @@ document.getElementById("messageInput");
 const imageInput =
 document.getElementById("imageInput");
 
-const profileBtn =
-document.getElementById("profileBtn");
 
-const profileModal =
-document.getElementById("profileModal");
-
-const closeProfileBtn =
-document.getElementById("closeProfileBtn");
-
-const profilePicInput =
-document.getElementById("profilePicInput");
-
-const profileAvatar =
-document.getElementById("profileAvatar");
-
-const profileUsername =
-document.getElementById("profileUsername");
-
-const searchOpenBtn =
-document.getElementById("searchOpenBtn");
-
-const searchModal =
-document.getElementById("searchModal");
-
-const closeSearchBtn =
-document.getElementById("closeSearchBtn");
 
 window.onload = ()=>{
 
@@ -461,23 +436,7 @@ document
   .classList.remove("chat-open");
 
 };
-searchOpenBtn.onclick = () => {
 
-  searchModal.style.display =
-  "flex";
-
-};
-
-closeSearchBtn.onclick = () => {
-
-  searchModal.style.display =
-  "none";
-
-};
-profileBtn.onclick = async () => {
-
-  profileModal.style.display =
-  "flex";
 
   const res =
   await fetch("/profile/" + me);
@@ -501,7 +460,7 @@ profileBtn.onclick = async () => {
 
   }
 
-};
+;
 closeProfileBtn.onclick = () => {
 
   profileModal.style.display =
