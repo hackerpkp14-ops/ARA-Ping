@@ -3,126 +3,80 @@ const socket = io();
 let me = "";
 let currentUser = "";
 
-const auth =
-document.getElementById("auth");
+const auth = document.getElementById("auth");
+const app = document.getElementById("app");
+const usersBox = document.getElementById("users");
+const messages = document.getElementById("messages");
+const messageInput = document.getElementById("messageInput");
+const imageInput = document.getElementById("imageInput");
 
-const app =
-document.getElementById("app");
+window.onload = () => {
 
-const usersBox =
-document.getElementById("users");
+  const saved = localStorage.getItem("ara-user");
 
-const messages =
-document.getElementById("messages");
-
-const chatHeader =
-document.getElementById("chatHeader");
-
-const messageInput =
-document.getElementById("messageInput");
-
-const imageInput =
-document.getElementById("imageInput");
-
-
-
-window.onload = ()=>{
-
-  const saved =
-  localStorage.getItem("ara-user");
-
-  if(saved){
+  if (saved) {
 
     me = saved;
 
     auth.style.display = "none";
-
     app.style.display = "flex";
 
     loadRecentChats();
-
   }
-
 };
 
-async function post(url,data){
+async function post(url, data) {
 
-  const res = await fetch(url,{
-
-    method:"POST",
-
-    headers:{
-      "Content-Type":"application/json"
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
     },
-
-    body:JSON.stringify(data)
-
+    body: JSON.stringify(data)
   });
 
   return await res.json();
-
 }
 
-document
-.getElementById("signupBtn")
-.onclick = async()=>{
+// SIGNUP
+
+document.getElementById("signupBtn").onclick = async () => {
 
   const username =
-  document
-  .getElementById("username")
-  .value
-  .trim();
+    document.getElementById("username").value.trim();
 
   const password =
-  document
-  .getElementById("password")
-  .value
-  .trim();
+    document.getElementById("password").value.trim();
 
-  const data =
-  await post("/signup",{
+  const data = await post("/signup", {
     username,
     password
   });
 
-  if(data.ok){
-
+  if (data.ok) {
     alert("Signup successful");
-
-  }else{
-
+  } else {
     alert(data.error);
-
   }
-
 };
 
-document
-.getElementById("loginBtn")
-.onclick = async()=>{
+// LOGIN
+
+document.getElementById("loginBtn").onclick = async () => {
 
   const username =
-  document
-  .getElementById("username")
-  .value
-  .trim();
+    document.getElementById("username").value.trim();
 
   const password =
-  document
-  .getElementById("password")
-  .value
-  .trim();
+    document.getElementById("password").value.trim();
 
-  const data =
-  await post("/login",{
+  const data = await post("/login", {
     username,
     password
   });
 
-  if(!data.ok){
-
+  if (!data.ok) {
     return alert(data.error);
-
   }
 
   me = data.username;
@@ -133,56 +87,60 @@ document
   );
 
   auth.style.display = "none";
-
   app.style.display = "flex";
 
   loadRecentChats();
-
 };
 
-document
-.getElementById("logoutBtn")
-.onclick = ()=>{
+// LOGOUT
 
-  localStorage.removeItem(
-    "ara-user"
-  );
+const logoutBtn =
+document.getElementById("logoutBtn");
 
-  location.reload();
+if(logoutBtn){
 
-};
+  logoutBtn.onclick = () => {
 
-async function loadRecentChats(){
+    localStorage.removeItem("ara-user");
+    location.reload();
+
+  };
+}
+
+// LOAD CHATS
+
+async function loadRecentChats() {
 
   const res =
- await fetch("/chats/" + me);
+    await fetch("/chats/" + me);
 
   const users =
-  await res.json();
+    await res.json();
 
   usersBox.innerHTML = "";
 
   users.forEach(addUserToSidebar);
-
 }
 
-function addUserToSidebar(user){
+// SIDEBAR USER
+
+function addUserToSidebar(user) {
 
   const already =
-  [...usersBox.children]
-  .find(x=>
-    x.dataset.username === user.username
-  );
+    [...usersBox.children]
+      .find(x =>
+        x.dataset.username === user.username
+      );
 
-  if(already) return;
+  if (already) return;
 
   const div =
-  document.createElement("div");
+    document.createElement("div");
 
   div.className = "user";
 
   div.dataset.username =
-  user.username;
+    user.username;
 
   div.innerHTML = `
     <div class="userName">
@@ -194,130 +152,157 @@ function addUserToSidebar(user){
     </div>
   `;
 
-  div.onclick = ()=>{
+  div.onclick = () => {
+
+    console.log(
+      "CHAT CLICKED:",
+      user.username
+    );
+
     openChat(user.username);
+
   };
 
   usersBox.prepend(div);
-  div.onclick = ()=>{
-  console.log("CHAT CLICKED:", user.username);
-  openChat(user.username);
-};
-
 }
 
-document
-.getElementById("searchBtn")
-.onclick = async()=>{
+// SEARCH
 
-  const username =
-  document
-  .getElementById("searchInput")
-  .value
-  .trim();
+const searchBtn =
+document.getElementById("searchBtn");
 
-  if(!username) return;
+if(searchBtn){
 
-  if(username === me){
+  searchBtn.onclick = async () => {
 
-    return alert(
-      "Cannot search yourself"
-    );
+    const username =
+      document
+      .getElementById("searchInput")
+      .value
+      .trim();
 
-  }
+    if (!username) return;
 
-  const res =
-  await fetch("/search/" + username);
+    if (username === me) {
 
-  const users =
-  await res.json();
+      return alert(
+        "Cannot search yourself"
+      );
+    }
 
-  if(users.length === 0){
+    const res =
+      await fetch(
+        "/search/" + username
+      );
 
-    return alert("User not found");
+    const users =
+      await res.json();
 
-  }
+    if (users.length === 0) {
 
-  addUserToSidebar({
-    username:users[0].username,
-    text:"Start conversation"
-  });
+      return alert(
+        "User not found"
+      );
+    }
 
-};
+    addUserToSidebar({
+      username:
+      users[0].username,
+      text:
+      "Start conversation"
+    });
 
-async function openChat(user){
+  };
+}
 
-console.log("OPENCHAT RUNNING:", user);
+// OPEN CHAT
+
+async function openChat(user) {
+
+  console.log(
+    "OPENCHAT RUNNING:",
+    user
+  );
 
   currentUser = user;
 
-  document.getElementById("chatName").innerText = user;
+  document.getElementById(
+    "chatName"
+  ).innerText = user;
 
   document
-  .getElementById("app")
-  .classList.add("chat-open");
+    .getElementById("app")
+    .classList.add("chat-open");
 
   const res =
-  await fetch(
-    `/messages/${me}/${user}`
+    await fetch(
+      `/messages/${me}/${user}`
+    );
+
+  console.log(
+    "FETCH STATUS:",
+    res.status
   );
 
-  console.log("FETCH STATUS:", res.status);
-
   const data =
-  await res.json();
+    await res.json();
 
-  console.log("MESSAGES:", data);
+  console.log(
+    "MESSAGES:",
+    data
+  );
 
   messages.innerHTML = "";
 
   data.forEach(renderMessage);
-
 }
 
+// RENDER MESSAGE
 
+function renderMessage(m) {
 
-function renderMessage(m){
+  console.log(
+    "RENDERING:",
+    m
+  );
 
-  if(
+  if (
     (m.from === me &&
-    m.to === currentUser)
+      m.to === currentUser)
     ||
     (m.from === currentUser &&
-    m.to === me)
-  ){
+      m.to === me)
+  ) {
 
     const div =
-    document.createElement("div");
+      document.createElement("div");
 
     div.className = "msg";
 
-    if(m.from === me){
+    if (m.from === me) {
       div.classList.add("mine");
     }
 
     const time =
-    new Date(m.createdAt)
-    .toLocaleTimeString([],{
-      hour:"2-digit",
-      minute:"2-digit"
-    });
+      new Date(
+        m.createdAt
+      ).toLocaleTimeString(
+        [],
+        {
+          hour: "2-digit",
+          minute: "2-digit"
+        }
+      );
 
     div.innerHTML = `
-      ${
-        m.text
-        ?
-        `<div>${m.text}</div>`
-        :
-        ""
+      ${m.text
+        ? `<div>${m.text}</div>`
+        : ""
       }
 
-      ${
-        m.image
-        ?
-        `<img src="${m.image}">`
-        :
-        ""
+      ${m.image
+        ? `<img src="${m.image}">`
+        : ""
       }
 
       <span class="time">
@@ -328,174 +313,178 @@ function renderMessage(m){
     messages.appendChild(div);
 
     messages.scrollTop =
-    messages.scrollHeight;
-
+      messages.scrollHeight;
   }
-
 }
+
+// SEND MESSAGE
 
 document
 .getElementById("sendBtn")
 .onclick = sendMessage;
 
-async function sendMessage(){
+async function sendMessage() {
 
   const text =
-  messageInput.value.trim();
+    messageInput.value.trim();
 
-  if(!text || !currentUser){
+  if (!text || !currentUser) {
     return;
   }
 
-  const payload = {
+  socket.emit("message", {
 
-    from:me,
-
-    to:currentUser,
-
+    from: me,
+    to: currentUser,
     text
 
-  };
-
-  socket.emit("message",payload);
-
-  addUserToSidebar({
-    username:currentUser,
-    text
   });
 
   messageInput.value = "";
-
 }
 
-messageInput
-.addEventListener(
-  "keypress",
-  (e)=>{
+// ENTER KEY
 
-    if(e.key === "Enter"){
+messageInput.addEventListener(
+  "keypress",
+  (e) => {
+
+    if (e.key === "Enter") {
 
       sendMessage();
 
     }
-
   }
 );
 
-imageInput
-.addEventListener(
+// IMAGE
+
+imageInput.addEventListener(
   "change",
-  async()=>{
+  async () => {
 
     const file =
-    imageInput.files[0];
+      imageInput.files[0];
 
-    if(!file || !currentUser){
+    if (!file ||
+      !currentUser) {
       return;
     }
 
     const form =
-    new FormData();
+      new FormData();
 
-    form.append("image",file);
+    form.append(
+      "image",
+      file
+    );
 
     const res =
-    await fetch("/upload",{
-
-      method:"POST",
-
-      body:form
-
-    });
+      await fetch(
+        "/upload",
+        {
+          method: "POST",
+          body: form
+        }
+      );
 
     const data =
-    await res.json();
+      await res.json();
 
-    socket.emit("message",{
+    socket.emit(
+      "message",
+      {
+        from: me,
+        to: currentUser,
+        image: data.image
+      }
+    );
+  }
+);
 
-      from:me,
+// SOCKET MESSAGE
 
-      to:currentUser,
+socket.on(
+  "message",
+  (data) => {
 
-      image:data.image
+    renderMessage(data);
+
+    addUserToSidebar({
+
+      username:
+        data.from === me
+          ? data.to
+          : data.from,
+
+      text:
+        data.text ||
+        "📷 Image"
 
     });
 
   }
 );
 
-socket.on("message",(data)=>{
+// MOBILE BACK
 
-  renderMessage(data);
+const backBtn =
+document.getElementById(
+  "backBtn"
+);
 
-  addUserToSidebar({
-    username:
-    data.from === me
-    ? data.to
-    : data.from,
+if(backBtn){
 
-    text:
-    data.text || "📷 Image"
-  });
+  backBtn.onclick = () => {
 
-});
-document
-.getElementById("backBtn")
-.onclick = () => {
+    document
+      .getElementById("app")
+      .classList.remove(
+        "chat-open"
+      );
 
-  document
-  .getElementById("app")
-  .classList.remove("chat-open");
+  };
+}
 
-};
-
-
-socket.on("message",(data)=>{
-
-  renderMessage(data);
-
-  rToSidebar({
-    username:
-    data.from === me
-    ? data.to
-    : data.from,
-
-    text:
-    data.text || "📷 Image"
-  });
-
-});
-
-document
-.getElementById("backBtn")
-.onclick = () => {
-
-  document
-  .getElementById("app")
-  .classList.remove("chat-open");
-
-};
+// SETTINGS MODAL
 
 const settingsBtn =
-document.getElementById("settingsBtn");
+document.getElementById(
+  "settingsBtn"
+);
 
 const settingsModal =
-document.getElementById("settingsModal");
+document.getElementById(
+  "settingsModal"
+);
 
-if(settingsBtn && settingsModal){
+if (
+  settingsBtn &&
+  settingsModal
+) {
 
   settingsBtn.onclick = () => {
 
-    settingsModal.classList.add("show");
+    settingsModal
+    .classList.add(
+      "show"
+    );
 
   };
 
-  settingsModal.onclick = (e)=>{
+  settingsModal.onclick =
+  (e) => {
 
-    if(e.target === settingsModal){
+    if (
+      e.target ===
+      settingsModal
+    ) {
 
-      settingsModal.classList.remove("show");
+      settingsModal
+      .classList.remove(
+        "show"
+      );
 
     }
-  }
+  };
 }
