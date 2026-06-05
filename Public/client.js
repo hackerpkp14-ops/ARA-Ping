@@ -437,48 +437,6 @@ document
 
 };
 
-    const file =
-    profilePicInput.files[0];
-
-    if(!file) return;
-
-    const form =
-    new FormData();
-
-    form.append(
-      "image",
-      file
-    );
-
-    form.append(
-      "username",
-      me
-    );
-
-    const res =
-    await fetch(
-      "/upload-profile",
-      {
-        method:"POST",
-        body:form
-      }
-    );
-
-    const data =
-    await res.json();
-
-    if(data.ok){
-
-      profileAvatar.innerHTML =
-      `<img src="${data.image}" style="width:100%;height:100%;border-radius:50%;">`;
-
-      alert(
-        "Profile updated"
-      );
-
-      loadRecentChats();
-
-    }
 
 socket.on("message",(data)=>{
 
@@ -530,4 +488,4 @@ if(settingsBtn && settingsModal){
 
   };
 
-}s
+}
