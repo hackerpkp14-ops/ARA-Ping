@@ -259,62 +259,35 @@ async function openChat(user) {
 
 // RENDER MESSAGE
 
-function renderMessage(m) {
+function renderMessage(m){
 
-  console.log(
-    "RENDERING:",
-    m
-  );
+  const div =
+  document.createElement("div");
 
-  if (
-    (m.from === me &&
-      m.to === currentUser)
-    ||
-    (m.from === currentUser &&
-      m.to === me)
-  ) {
+  div.className = "msg";
 
-    const div =
-      document.createElement("div");
-
-    div.className = "msg";
-
-    if (m.from === me) {
-      div.classList.add("mine");
-    }
-
-    const time =
-      new Date(
-        m.createdAt
-      ).toLocaleTimeString(
-        [],
-        {
-          hour: "2-digit",
-          minute: "2-digit"
-        }
-      );
-
-    div.innerHTML = `
-      ${m.text
-        ? `<div>${m.text}</div>`
-        : ""
-      }
-
-      ${m.image
-        ? `<img src="${m.image}">`
-        : ""
-      }
-
-      <span class="time">
-        ${time}
-      </span>
-    `;
-
-    messages.appendChild(div);
-
-    messages.scrollTop =
-      messages.scrollHeight;
+  if(m.from === me){
+    div.classList.add("mine");
   }
+
+  const time =
+  new Date(m.createdAt)
+  .toLocaleTimeString([],{
+    hour:"2-digit",
+    minute:"2-digit"
+  });
+
+  div.innerHTML = `
+    ${m.text ? `<div>${m.text}</div>` : ""}
+    ${m.image ? `<img src="${m.image}">` : ""}
+    <span class="time">${time}</span>
+  `;
+
+  messages.appendChild(div);
+
+  messages.scrollTop =
+  messages.scrollHeight;
+
 }
 
 // SEND MESSAGE
