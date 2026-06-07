@@ -523,6 +523,12 @@ body{
   font-size:42px;
 }
 
+.headerBtns{
+  display:flex;
+  gap:10px;
+}
+
+#searchOpenBtn,
 #settingsBtn{
   width:50px;
   height:50px;
@@ -532,6 +538,9 @@ body{
   color:white;
   font-size:22px;
   cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 #searchContainer{

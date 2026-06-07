@@ -177,7 +177,7 @@ if(searchBtn){
 
     const username =
       document
-      .getElementById("searchInput")
+      .getElementById("searchModalInput")
       .value
       .trim();
 
@@ -460,4 +460,34 @@ if (
 
     }
   };
+}
+const searchOpenBtn =
+document.getElementById("searchOpenBtn");
+
+const searchModal =
+document.getElementById("searchModal");
+
+const closeSearchBtn =
+document.getElementById("closeSearchBtn");
+
+if(searchOpenBtn){
+
+  searchOpenBtn.onclick = () => {
+
+    searchModal.style.display =
+    "flex";
+
+  };
+
+}
+
+if(closeSearchBtn){
+
+  closeSearchBtn.onclick = () => {
+
+    searchModal.style.display =
+    "none";
+
+  };
+
 }
