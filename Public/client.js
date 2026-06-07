@@ -175,7 +175,7 @@ if(searchBtn){
 
 searchBtn.onclick = async () => {
 
-```
+
 const username =
 document
 .getElementById("searchModalInput")
@@ -247,7 +247,7 @@ try{
   );
 
 }
-```
+
 
 };
 
@@ -294,6 +294,7 @@ async function openChat(user) {
   messages.innerHTML = "";
 
   data.forEach(renderMessage);
+
 }
 
 // RENDER MESSAGE
@@ -420,7 +421,7 @@ socket.on(
 "message",
 (data) => {
 
-```
+
 if(
   (
     data.from === currentUser &&
@@ -446,7 +447,7 @@ addUserToSidebar({
   data.text || "📷 Image"
 
 });
-```
+
 
 }
 );
