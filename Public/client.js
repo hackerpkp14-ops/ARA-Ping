@@ -173,47 +173,86 @@ document.getElementById("searchBtn");
 
 if(searchBtn){
 
-  searchBtn.onclick = async () => {
+searchBtn.onclick = async () => {
 
-    const username =
-      document
-      .getElementById("searchModalInput")
-      .value
-      .trim();
+```
+const username =
+document
+.getElementById("searchModalInput")
+.value
+.trim();
 
-    if (!username) return;
+if(!username) return;
 
-    if (username === me) {
+if(username === me){
 
-      return alert(
-        "Cannot search yourself"
-      );
-    }
+  return alert(
+    "Cannot search yourself"
+  );
 
-    const res =
-      await fetch(
-        "/search/" + username
-      );
+}
 
-    const users =
-      await res.json();
+try{
 
-    if (users.length === 0) {
+  const res =
+  await fetch(
+    "/search/" + username
+  );
 
-      return alert(
-        "User not found"
-      );
-    }
+  const users =
+  await res.json();
+
+  console.log(
+    "SEARCH RESULT:",
+    users
+  );
+
+  if(users.length === 0){
+
+    return alert(
+      "User not found"
+    );
+
+  }
+
+  users.forEach(user => {
 
     addUserToSidebar({
+
       username:
-      users[0].username,
+      user.username,
+
       text:
       "Start conversation"
+
     });
 
-  };
+  });
+
+  searchModal.style.display =
+  "none";
+
+  document
+  .getElementById(
+    "searchModalInput"
+  )
+  .value = "";
+
+}catch(err){
+
+  console.error(err);
+
+  alert(
+    "Search failed"
+  );
+
 }
+```
+
+};
+
+}
+
 
 // OPEN CHAT
 
@@ -378,26 +417,40 @@ imageInput.addEventListener(
 // SOCKET MESSAGE
 
 socket.on(
-  "message",
-  (data) => {
+"message",
+(data) => {
 
-    renderMessage(data);
+```
+if(
+  (
+    data.from === currentUser &&
+    data.to === me
+  )
+  ||
+  (
+    data.from === me &&
+    data.to === currentUser
+  )
+){
+  renderMessage(data);
+}
 
-    addUserToSidebar({
+addUserToSidebar({
 
-      username:
-        data.from === me
-          ? data.to
-          : data.from,
+  username:
+  data.from === me
+  ? data.to
+  : data.from,
 
-      text:
-        data.text ||
-        "📷 Image"
+  text:
+  data.text || "📷 Image"
 
-    });
+});
+```
 
-  }
+}
 );
+
 
 // MOBILE BACK
 
