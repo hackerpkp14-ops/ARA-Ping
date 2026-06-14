@@ -16,13 +16,21 @@ window.onload = () => {
 
   if (saved) {
 
-    me = saved;
+me = saved;
 
-    auth.style.display = "none";
-    app.style.display = "flex";
+socket.emit(
+"user-online",
+me
+);
 
-    loadRecentChats();
-  }
+auth.style.display = "none";
+
+app.style.display = "flex";
+
+loadRecentChats();
+
+}
+
 };
 
 async function post(url, data) {
@@ -76,20 +84,25 @@ document.getElementById("loginBtn").onclick = async () => {
   });
 
   if (!data.ok) {
-    return alert(data.error);
-  }
+return alert(data.error);
+}
 
-  me = data.username;
+me = data.username;
 
-  localStorage.setItem(
-    "ara-user",
-    me
-  );
+localStorage.setItem(
+"ara-user",
+me
+);
 
-  auth.style.display = "none";
-  app.style.display = "flex";
+socket.emit(
+"user-online",
+me
+);
 
-  loadRecentChats();
+auth.style.display = "none";
+app.style.display = "flex";
+
+loadRecentChats();
 };
 
 // LOGOUT
@@ -272,6 +285,14 @@ async function openChat(user) {
   document
     .getElementById("app")
     .classList.add("chat-open");
+
+    document
+    .getElementById("chatStatus")
+    .innerText =
+
+  onlineUsers.includes(user)
+  ? "Online"
+  : "Offline";
 
   const res =
     await fetch(
@@ -545,3 +566,114 @@ if(closeSearchBtn){
   };
 
 }
+const profilePicInput =
+document.getElementById(
+"profilePicInput"
+);
+
+if(profilePicInput){
+
+profilePicInput.addEventListener(
+"change",
+async () => {
+
+  const file =
+  profilePicInput.files[0];
+
+  if(!file) return;
+
+  const form =
+  new FormData();
+
+  form.append(
+    "image",
+    file
+  );
+
+  form.append(
+    "username",
+    me
+  );
+
+  try{
+
+    const res =
+    await fetch(
+      "/upload-profile",
+      {
+        method:"POST",
+        body:form
+      }
+    );
+
+    const data =
+    await res.json();
+
+    console.log(
+      "PROFILE UPLOAD:",
+      data
+    );
+
+    if(data.ok){
+
+      const img =
+      document.getElementById(
+        "profilePreview"
+      );
+
+      if(img){
+        img.src = data.image;
+      }
+
+      alert(
+        "Profile picture updated"
+      );
+
+    }else{
+
+      alert(
+        "Upload failed"
+      );
+
+    }
+
+  }catch(err){
+
+    console.error(err);
+
+    alert(
+      "Upload failed"
+    );
+
+  }
+
+}
+);
+}
+let onlineUsers = [];
+
+socket.on(
+"online-users",
+users => {
+
+
+onlineUsers = users;
+
+if(currentUser){
+
+  document
+  .getElementById(
+    "chatStatus"
+  )
+  .innerText =
+
+  onlineUsers.includes(
+    currentUser
+  )
+  ? "Online"
+  : "Offline";
+
+}
+
+}
+);

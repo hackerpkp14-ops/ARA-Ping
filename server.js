@@ -365,36 +365,95 @@ app.post(
    SOCKET
 ====================== */
 
+const onlineUsers = {};
+
 io.on("connection", socket => {
 
-  socket.on(
-    "message",
-    async data => {
+socket.on("user-online", username => {
 
-      try {
 
-        const saved =
-          await Message.create({
+onlineUsers[username] = socket.id;
 
-            from: data.from,
-            to: data.to,
-            text: data.text || "",
-            image: data.image || ""
+io.emit(
+  "online-users",
+  Object.keys(onlineUsers)
+);
 
-          });
-
-        io.emit("message", saved);
-
-      } catch (err) {
-
-        console.log(err);
-
-      }
-
-    }
-  );
 
 });
+
+socket.on(
+"message",
+async data => {
+
+
+  try {
+
+    const saved =
+    await Message.create({
+
+      from: data.from,
+      to: data.to,
+      text: data.text || "",
+      image: data.image || ""
+
+    });
+
+    io.emit(
+      "message",
+      saved
+    );
+
+  } catch(err){
+
+    console.log(err);
+
+  }
+
+}
+
+
+);
+
+socket.on(
+"disconnect",
+() => {
+
+
+  for(
+    const username
+    in onlineUsers
+  ){
+
+    if(
+      onlineUsers[username]
+      === socket.id
+    ){
+
+      delete onlineUsers[
+        username
+      ];
+
+      break;
+
+    }
+
+  }
+
+  io.emit(
+    "online-users",
+    Object.keys(
+      onlineUsers
+    )
+  );
+
+}
+
+
+);
+
+});
+
 
 /* ======================
    SERVER
