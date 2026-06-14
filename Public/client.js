@@ -33,6 +33,53 @@ loadRecentChats();
 
 };
 
+async function loadMyProfile(){
+
+  try{
+
+    const res =
+    await fetch(
+      "/user/" + me
+    );
+
+    const user =
+    await res.json();
+
+    const img =
+    document.getElementById(
+      "profilePreview"
+    );
+
+    const name =
+    document.getElementById(
+      "profileName"
+    );
+
+    if(
+      img &&
+      user.profilePic
+    ){
+
+      img.src =
+      user.profilePic;
+
+    }
+
+    if(name){
+
+      name.innerText =
+      user.username;
+
+    }
+
+  }catch(err){
+
+    console.log(err);
+
+  }
+
+}
+
 async function post(url, data) {
 
   const res = await fetch(url, {
@@ -103,6 +150,7 @@ auth.style.display = "none";
 app.style.display = "flex";
 
 loadRecentChats();
+loadMyProfile();
 };
 
 // LOGOUT
