@@ -28,53 +28,42 @@ auth.style.display = "none";
 app.style.display = "flex";
 
 loadRecentChats();
+loadMyProfile();
 
 }
 
 };
 
-async function loadMyProfile(){
+async function loadMyProfile() {
 
-  try{
+  console.log("LOAD PROFILE START");
 
-    const res =
-    await fetch(
-      "/user/" + me
+  const res =
+  await fetch(
+    "/user/" + me
+  );
+
+  const user =
+  await res.json();
+
+  console.log("USER:", user);
+
+  const img =
+  document.getElementById(
+    "profilePreview"
+  );
+
+  console.log("IMG:", img);
+
+  if(img){
+
+    img.src =
+    user.profilePic;
+
+    console.log(
+      "SRC SET TO:",
+      img.src
     );
-
-    const user =
-    await res.json();
-
-    const img =
-    document.getElementById(
-      "profilePreview"
-    );
-
-    const name =
-    document.getElementById(
-      "profileName"
-    );
-
-    if(
-      img &&
-      user.profilePic
-    ){
-
-      img.src =
-      user.profilePic;
-
-    }
-
-    if(name){
-
-      name.innerText =
-      user.username;
-
-    }
-
-  }catch(err){
-
-    console.log(err);
 
   }
 
