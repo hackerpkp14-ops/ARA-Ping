@@ -566,19 +566,36 @@ if(closeSearchBtn){
   };
 
 }
-const profilePicInput =
+const changeProfileBtn =
 document.getElementById(
-"profilePicInput"
+"changeProfileBtn"
 );
 
-if(profilePicInput){
+const settingsProfilePicInput =
+document.getElementById(
+"settingsProfilePicInput"
+);
 
-profilePicInput.addEventListener(
+if(
+changeProfileBtn &&
+settingsProfilePicInput
+){
+
+changeProfileBtn.onclick = () => {
+
+
+settingsProfilePicInput.click();
+
+
+};
+
+settingsProfilePicInput.addEventListener(
 "change",
 async () => {
 
+
   const file =
-  profilePicInput.files[0];
+  settingsProfilePicInput.files[0];
 
   if(!file) return;
 
@@ -648,8 +665,11 @@ async () => {
   }
 
 }
+
 );
+
 }
+
 let onlineUsers = [];
 
 socket.on(
