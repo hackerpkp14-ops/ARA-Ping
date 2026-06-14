@@ -469,3 +469,30 @@ server.listen(PORT, () => {
   );
 
 });
+app.get(
+  "/user/:username",
+  async (req, res) => {
+
+    const user =
+    await User.findOne({
+      username:
+      req.params.username
+    });
+
+    res.json(user);
+
+  }
+);app.get(
+  "/user/:username",
+  async (req, res) => {
+
+    const user =
+    await User.findOne({
+      username:
+      req.params.username
+    });
+
+    res.json(user);
+
+  }
+);
