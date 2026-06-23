@@ -9,6 +9,26 @@ const fs = require("fs");
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
+const cloudinary =
+require("cloudinary").v2;
+
+const {
+CloudinaryStorage
+} = require(
+"multer-storage-cloudinary"
+);
+cloudinary.config({
+
+  cloud_name:
+  process.env.CLOUDINARY_CLOUD_NAME,
+
+  api_key:
+  process.env.CLOUDINARY_API_KEY,
+
+  api_secret:
+  process.env.CLOUDINARY_API_SECRET
+
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -80,19 +100,38 @@ const Message = mongoose.model("Message", MessageSchema);
    MULTER IMAGE STORAGE
 ====================== */
 
-const storage = multer.diskStorage({
+const cloudinary =
+require("cloudinary").v2;
 
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
+const {
+  CloudinaryStorage
+} = require(
+  "multer-storage-cloudinary"
+);
 
-  filename: (req, file, cb) => {
-    cb(
-      null,
-      Date.now() +
-      "-" +
-      file.originalname
-    );
+cloudinary.config({
+
+  cloud_name:
+  process.env.CLOUDINARY_CLOUD_NAME,
+
+  api_key:
+  process.env.CLOUDINARY_API_KEY,
+
+  api_secret:
+  process.env.CLOUDINARY_API_SECRET
+
+});
+
+const storage =
+new CloudinaryStorage({
+
+  cloudinary,
+
+  params: {
+
+    folder:
+    "ara-ping"
+
   }
 
 });
@@ -317,8 +356,7 @@ app.post(
 
     res.json({
       image:
-        "/uploads/" +
-        req.file.filename
+      req.file.path
     });
 
   }
@@ -333,8 +371,7 @@ app.post(
       const username = req.body.username;
 
       const image =
-        "/uploads/" +
-        req.file.filename;
+        req.file.path;
 
       await User.updateOne(
         { username },
@@ -360,14 +397,7 @@ app.post(
 
   }
 );
-app.get("/debug-uploads", (req, res) => {
 
-  const files =
-  fs.readdirSync("uploads");
-
-  res.json(files);
-
-});
 
 /* ======================
    SOCKET
