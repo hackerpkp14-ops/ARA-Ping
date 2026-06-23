@@ -360,6 +360,14 @@ app.post(
 
   }
 );
+app.get("/debug-uploads", (req, res) => {
+
+  const files =
+  fs.readdirSync("uploads");
+
+  res.json(files);
+
+});
 
 /* ======================
    SOCKET
