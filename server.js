@@ -84,11 +84,6 @@ const Message = mongoose.model("Message", MessageSchema);
 const cloudinary =
 require("cloudinary").v2;
 
-const CloudinaryStorage =
-require(
-  "multer-storage-cloudinary"
-);
-
 cloudinary.config({
 
   cloud_name:
@@ -102,20 +97,9 @@ cloudinary.config({
 
 });
 
-const storage =
-new CloudinaryStorage({
-
-  cloudinary,
-
-  params: {
-    folder: "ara-ping"
-  }
-
-});
-
 const upload =
 multer({
-  storage
+  dest: "temp/"
 });
 
 /* ======================
@@ -330,12 +314,31 @@ app.get("/messages/:a/:b", async (req, res) => {
 app.post(
   "/upload",
   upload.single("image"),
-  (req, res) => {
+  async (req, res) => {
 
-    res.json({
-      image:
-      req.file.path
-    });
+    try {
+
+      const result =
+      await cloudinary.uploader.upload(
+        req.file.path,
+        {
+          folder: "ara-ping"
+        }
+      );
+
+      res.json({
+        image: result.secure_url
+      });
+
+    } catch (err) {
+
+      console.log(err);
+
+      res.status(500).json({
+        error: "Upload failed"
+      });
+
+    }
 
   }
 );
@@ -346,10 +349,19 @@ app.post(
 
     try {
 
-      const username = req.body.username;
+      const username =
+      req.body.username;
+
+      const result =
+      await cloudinary.uploader.upload(
+        req.file.path,
+        {
+          folder: "ara-ping/profile"
+        }
+      );
 
       const image =
-        req.file.path;
+      result.secure_url;
 
       await User.updateOne(
         { username },
@@ -367,7 +379,7 @@ app.post(
 
       console.log(err);
 
-      res.json({
+      res.status(500).json({
         ok: false
       });
 
