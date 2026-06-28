@@ -193,27 +193,38 @@ function addUserToSidebar(user) {
     user.username;
 
   div.innerHTML = `
-    <div class="userName">
-      ${user.username}
+
+    <img
+      class="sidebarProfile"
+      src="${
+        user.profilePic ||
+        "https://ui-avatars.com/api/?name=" +
+        encodeURIComponent(user.username)
+      }"
+    >
+
+    <div class="userInfo">
+
+      <div class="userName">
+        ${user.username}
+      </div>
+
+      <div class="lastMsg">
+        ${user.lastMessage || user.text || ""}
+      </div>
+
     </div>
 
-    <div class="lastMsg">
-      ${user.lastMessage || user.text || ""}
-    </div>
   `;
 
   div.onclick = () => {
-
-    console.log(
-      "CHAT CLICKED:",
-      user.username
-    );
 
     openChat(user.username);
 
   };
 
   usersBox.prepend(div);
+
 }
 
 // SEARCH
