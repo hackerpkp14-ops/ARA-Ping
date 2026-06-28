@@ -128,11 +128,16 @@ body{
 }
 
 .user{
+
   padding:18px;
   border-bottom:1px solid #2a3942;
   cursor:pointer;
+
   display:flex;
-  flex-direction:column;
+  flex-direction:row;
+  align-items:center;
+  gap:12px;
+
 }
 
 .user:hover{
@@ -140,14 +145,18 @@ body{
 }
 
 .userName{
+
   font-size:20px;
-  font-weight:bold;
+  font-weight:600;
+
 }
 
 .lastMsg{
-  margin-top:4px;
-  color:#94a3b8;
-  font-size:14px;
+
+  color:#8b98a5;
+  font-size:15px;
+  margin-top:2px;
+
 }
 
 /* CHAT */
@@ -588,12 +597,9 @@ body{
 
   width:50px;
   height:50px;
-
   border-radius:50%;
-
   object-fit:cover;
-
-  margin-right:12px;
+  flex-shrink:0;
 
 }
 
@@ -606,6 +612,29 @@ body{
 
 .userInfo{
 
-  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+
+}
+#chatAvatar{
+
+  width:55px;
+  height:55px;
+
+  border-radius:50%;
+
+  object-fit:cover;
+
+  margin-right:15px;
+
+  background:#0b8f6a;
+
+}
+
+#chatUserInfo{
+
+  display:flex;
+  align-items:center;
 
 }

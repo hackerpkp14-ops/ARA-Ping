@@ -330,11 +330,30 @@ async function openChat(user) {
     "chatName"
   ).innerText = user;
 
+  // NEW CODE START
+  const profileRes =
+    await fetch(`/profile/${user}`);
+
+  const profileData =
+    await profileRes.json();
+
+  if(profileData.ok){
+
+    document.getElementById(
+      "chatAvatar"
+    ).src =
+    profileData.profilePic ||
+    "https://ui-avatars.com/api/?name=" +
+    encodeURIComponent(user);
+
+  }
+  // NEW CODE END
+
   document
     .getElementById("app")
     .classList.add("chat-open");
 
-    document
+  document
     .getElementById("chatStatus")
     .innerText =
 
