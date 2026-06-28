@@ -355,6 +355,7 @@ async function openChat(user) {
 
   await fetch(
   "/seen",
+  
   {
     method: "POST",
 
@@ -372,6 +373,8 @@ async function openChat(user) {
 
   }
 );
+await loadRecentChats();
+
   document.getElementById(
     "chatName"
   ).innerText = user;
@@ -555,33 +558,27 @@ socket.on(
 "message",
 (data) => {
 
+  if(
 
-if(
-  (
-    data.from === currentUser &&
-    data.to === me
-  )
-  ||
-  (
-    data.from === me &&
-    data.to === currentUser
-  )
-){
-  renderMessage(data);
-}
+    (
+      data.from === currentUser &&
+      data.to === me
+    )
 
-addUserToSidebar({
+    ||
 
-  username:
-  data.from === me
-  ? data.to
-  : data.from,
+    (
+      data.from === me &&
+      data.to === currentUser
+    )
 
-  text:
-  data.text || "📷 Image"
+  ){
 
-});
+    renderMessage(data);
 
+  }
+
+  loadRecentChats();
 
 }
 );
