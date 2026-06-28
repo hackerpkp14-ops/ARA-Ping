@@ -284,13 +284,33 @@ app.get("/chats/:me", async (req, res) => {
         username: other
       });
 
-    users.push({
-      username: other,
-      profilePic:
-        profileUser?.profilePic || "",
-      lastMessage:
-        m.text || "📷 Image"
-    });
+    const unread =
+await Message.countDocuments({
+
+  from: other,
+
+  to: me,
+
+  seen: false
+
+});
+
+users.push({
+
+  username: other,
+
+  profilePic:
+    profileUser?.profilePic || "",
+
+  lastMessage:
+    m.text || "📷 Image",
+
+  lastTime:
+    m.createdAt,
+
+  unread
+
+});
 
   }
 

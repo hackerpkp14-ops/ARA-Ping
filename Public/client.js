@@ -192,6 +192,15 @@ function addUserToSidebar(user) {
   div.dataset.username =
     user.username;
 
+  const time =
+    user.lastTime
+    ? new Date(user.lastTime)
+        .toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit"
+        })
+    : "";
+
   div.innerHTML = `
 
     <img
@@ -205,12 +214,30 @@ function addUserToSidebar(user) {
 
     <div class="userInfo">
 
-      <div class="userName">
-        ${user.username}
+      <div class="userTop">
+
+        <div class="userName">
+          ${user.username}
+        </div>
+
+        <div class="chatTime">
+          ${time}
+        </div>
+
       </div>
 
-      <div class="lastMsg">
-        ${user.lastMessage || user.text || ""}
+      <div class="userBottom">
+
+        <div class="lastMsg">
+          ${user.lastMessage || ""}
+        </div>
+
+        ${
+          user.unread > 0
+          ? `<div class="unreadBadge">${user.unread}</div>`
+          : ""
+        }
+
       </div>
 
     </div>
