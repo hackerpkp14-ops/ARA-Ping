@@ -326,6 +326,25 @@ async function openChat(user) {
 
   currentUser = user;
 
+  await fetch(
+  "/seen",
+  {
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json"
+    },
+
+    body: JSON.stringify({
+
+      from: user,
+
+      to: me
+
+    })
+
+  }
+);
   document.getElementById(
     "chatName"
   ).innerText = user;

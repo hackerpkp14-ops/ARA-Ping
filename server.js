@@ -50,7 +50,6 @@ const UserSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
 const MessageSchema = new mongoose.Schema({
   from: String,
   to: String,
@@ -68,15 +67,17 @@ const MessageSchema = new mongoose.Schema({
     default: false
   },
 
+  // NEW
+  seen: {
+    type: Boolean,
+    default: false
+  },
+
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
-
-const User = mongoose.model("User", UserSchema);
-const Message = mongoose.model("Message", MessageSchema);
-
 /* ======================
    MULTER IMAGE STORAGE
 ====================== */
@@ -418,14 +419,17 @@ async data => {
   try {
 
     const saved =
-    await Message.create({
+await Message.create({
 
-      from: data.from,
-      to: data.to,
-      text: data.text || "",
-      image: data.image || ""
+  from: data.from,
+  to: data.to,
+  text: data.text || "",
+  image: data.image || "",
 
-    });
+  // NEW
+  seen: false
+
+});
 
     io.emit(
       "message",
@@ -482,6 +486,42 @@ socket.on(
 
 });
 
+app.post(
+  "/seen",
+  async (req, res) => {
+
+    try {
+
+      await Message.updateMany(
+
+        {
+          from: req.body.from,
+          to: req.body.to,
+          seen: false
+        },
+
+        {
+          seen: true
+        }
+
+      );
+
+      res.json({
+        ok: true
+      });
+
+    } catch (err) {
+
+      console.log(err);
+
+      res.status(500).json({
+        ok: false
+      });
+
+    }
+
+  }
+);
 
 /* ======================
    SERVER
