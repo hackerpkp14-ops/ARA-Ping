@@ -78,6 +78,16 @@ const MessageSchema = new mongoose.Schema({
     default: Date.now
   }
 });
+const User = mongoose.model(
+  "User",
+  UserSchema
+);
+
+const Message = mongoose.model(
+  "Message",
+  MessageSchema
+);
+
 /* ======================
    MULTER IMAGE STORAGE
 ====================== */
