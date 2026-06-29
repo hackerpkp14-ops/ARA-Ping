@@ -9,6 +9,7 @@ const usersBox = document.getElementById("users");
 const messages = document.getElementById("messages");
 const messageInput = document.getElementById("messageInput");
 const imageInput = document.getElementById("imageInput");
+const sidebarUsers = {};
 
 window.onload = () => {
 
@@ -177,12 +178,15 @@ async function loadRecentChats() {
 function addUserToSidebar(user) {
 
   const already =
-    [...usersBox.children]
-      .find(x =>
-        x.dataset.username === user.username
-      );
+  sidebarUsers[user.username];
 
-  if (already) return;
+if (already) {
+
+  updateSidebarUser(user);
+
+  return;
+
+}
 
   const div =
     document.createElement("div");
@@ -250,6 +254,63 @@ function addUserToSidebar(user) {
 
   };
 
+  usersBox.prepend(div);
+
+sidebarUsers[user.username] = div;
+}
+function updateSidebarUser(user) {
+
+  const div = sidebarUsers[user.username];
+
+  if (!div) return;
+
+  // Last message
+  div.querySelector(".lastMsg").innerText =
+    user.lastMessage || user.text || "";
+
+  // Time
+  if (user.lastTime) {
+
+    div.querySelector(".chatTime").innerText =
+      new Date(user.lastTime)
+        .toLocaleTimeString([], {
+
+          hour: "2-digit",
+
+          minute: "2-digit"
+
+        });
+
+  }
+
+  // Update unread badge
+  let badge =
+    div.querySelector(".unreadBadge");
+
+  if (user.unread > 0) {
+
+    if (!badge) {
+
+      badge =
+        document.createElement("div");
+
+      badge.className =
+        "unreadBadge";
+
+      div.querySelector(".userBottom")
+        .appendChild(badge);
+
+    }
+
+    badge.innerText = user.unread;
+
+  } else if (badge) {
+
+    badge.remove();
+
+  }
+
+  // Move chat to top
   usersBox.prepend(div);
 
 }
