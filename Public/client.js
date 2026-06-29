@@ -619,7 +619,7 @@ socket.on(
 "message",
 (data) => {
 
-  if(
+  if (
 
     (
       data.from === currentUser &&
@@ -633,17 +633,48 @@ socket.on(
       data.to === currentUser
     )
 
-  ){
+  ) {
 
     renderMessage(data);
 
   }
 
-  loadRecentChats();
+  const other =
+
+    data.from === me
+      ? data.to
+      : data.from;
+
+  const chatData = {
+
+    username: other,
+
+    lastMessage:
+      data.text || "📷 Image",
+
+    lastTime:
+      data.createdAt,
+
+    unread:
+      data.to === me &&
+      currentUser !== other
+        ? 1
+        : 0
+
+  };
+
+  if (sidebarUsers[other]) {
+
+    updateSidebarUser(chatData);
+
+  } else {
+
+    loadRecentChats();
+
+  }
 
 }
 );
-
 
 // MOBILE BACK
 
