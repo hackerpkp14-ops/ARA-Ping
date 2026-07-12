@@ -634,18 +634,14 @@ imageInput.addEventListener(
 
 // SOCKET MESSAGE
 
-socket.on(
-"message",
-(data) => {
+socket.on("message", (data) => {
 
   if (
 
     (
       data.from === currentUser &&
       data.to === me
-    )
-
-    ||
+    ) ||
 
     (
       data.from === me &&
@@ -677,10 +673,12 @@ socket.on(
     unread:
       data.to === me &&
       currentUser !== other
-        ? 1
+        ? (unreadCounts[other] || 0) + 1
         : 0
 
   };
+
+  unreadCounts[other] = chatData.unread;
 
   if (sidebarUsers[other]) {
 
@@ -692,8 +690,7 @@ socket.on(
 
   }
 
-}
-);
+});
 
 // MOBILE BACK
 
