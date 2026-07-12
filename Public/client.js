@@ -10,6 +10,7 @@ const messages = document.getElementById("messages");
 const messageInput = document.getElementById("messageInput");
 const imageInput = document.getElementById("imageInput");
 const sidebarUsers = {};
+const unreadCounts = {};
 
 window.onload = () => {
 
