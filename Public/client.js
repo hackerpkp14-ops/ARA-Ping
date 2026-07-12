@@ -168,11 +168,21 @@ async function loadRecentChats() {
   const users =
     await res.json();
 
-  usersBox.innerHTML = "";
+  users.forEach(user => {
 
-  users.forEach(addUserToSidebar);
+    if (sidebarUsers[user.username]) {
+
+      updateSidebarUser(user);
+
+    } else {
+
+      addUserToSidebar(user);
+
+    }
+
+  });
+
 }
-
 // SIDEBAR USER
 
 function addUserToSidebar(user) {
@@ -250,14 +260,14 @@ if (already) {
 
   div.onclick = () => {
 
-    openChat(user.username);
+  openChat(user.username);
 
-  };
-
-  usersBox.prepend(div);
-
+};
 sidebarUsers[user.username] = div;
+
+usersBox.prepend(div);
 }
+
 function updateSidebarUser(user) {
 
   const div = sidebarUsers[user.username];
@@ -282,6 +292,15 @@ function updateSidebarUser(user) {
         });
 
   }
+  function moveUserToTop(username){
+
+  const div = sidebarUsers[username];
+
+  if(!div) return;
+
+  usersBox.prepend(div);
+
+}
 
   // Update unread badge
   let badge =
