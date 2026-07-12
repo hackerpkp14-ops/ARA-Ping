@@ -453,7 +453,15 @@ async function openChat(user) {
 
   }
 );
-await loadRecentChats();
+unreadCounts[user] = 0;
+
+updateSidebarUser({
+
+  username: user,
+
+  unread: 0
+
+});
 
   document.getElementById(
     "chatName"
