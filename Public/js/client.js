@@ -2,6 +2,33 @@ const socket = io();
 
 let me = "";
 let currentUser = "";
+let onlineUsers = [];
+
+socket.on(
+"online-users",
+users => {
+
+
+onlineUsers = users;
+
+if(currentUser){
+
+  document
+  .getElementById(
+    "chatStatus"
+  )
+  .innerText =
+
+  onlineUsers.includes(
+    currentUser
+  )
+  ? "Online"
+  : "Offline";
+
+}
+
+}
+);
 
 const auth = document.getElementById("auth");
 const app = document.getElementById("app");
@@ -754,30 +781,3 @@ async () => {
 
 }
 
-let onlineUsers = [];
-
-socket.on(
-"online-users",
-users => {
-
-
-onlineUsers = users;
-
-if(currentUser){
-
-  document
-  .getElementById(
-    "chatStatus"
-  )
-  .innerText =
-
-  onlineUsers.includes(
-    currentUser
-  )
-  ? "Online"
-  : "Offline";
-
-}
-
-}
-);
