@@ -35,6 +35,7 @@ const app = document.getElementById("app");
 const usersBox = document.getElementById("users");
 const messages = document.getElementById("messages");
 const messageInput = document.getElementById("messageInput");
+let typingTimeout;
 const imageInput = document.getElementById("imageInput");
 const sidebarUsers = {};
 const unreadCounts = {};
@@ -620,6 +621,33 @@ async function sendMessage() {
 
   messageInput.value = "";
 }
+messageInput.addEventListener("input", () => {
+
+  if (!currentUser) return;
+
+  socket.emit("typing", {
+
+    from: me,
+
+    to: currentUser
+
+  });
+
+  clearTimeout(typingTimeout);
+
+  typingTimeout = setTimeout(() => {
+
+    socket.emit("stop-typing", {
+
+      from: me,
+
+      to: currentUser
+
+    });
+
+  }, 1000);
+
+});
 
 // ENTER KEY
 
@@ -735,6 +763,29 @@ socket.on("message", (data) => {
   } else {
 
     loadRecentChats();
+
+  }
+
+});
+socket.on("typing", (data) => {
+
+  const targetSocket = onlineUsers[data.to];
+
+  if (targetSocket) {
+
+    io.to(targetSocket).emit("typing", data);
+
+  }
+
+});
+
+socket.on("stop-typing", (data) => {
+
+  const targetSocket = onlineUsers[data.to];
+
+  if (targetSocket) {
+
+    io.to(targetSocket).emit("stop-typing", data);
 
   }
 

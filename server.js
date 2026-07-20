@@ -552,6 +552,17 @@ app.post(
 
   }
 );
+socket.on("typing", (data) => {
+
+  socket.broadcast.emit("typing", data);
+
+});
+
+socket.on("stop-typing", (data) => {
+
+  socket.broadcast.emit("stop-typing", data);
+
+});
 
 /* ======================
    SERVER
