@@ -40,6 +40,7 @@ const sidebarUsers = {};
 const unreadCounts = {};
 
 
+
 window.onload = () => {
 
   const saved = localStorage.getItem("ara-user");
@@ -456,8 +457,13 @@ async function openChat(user) {
   );
 
   currentUser = user;
+  document.getElementById("chatName").innerText = user;
 
-  await fetch(
+document
+  .getElementById("app")
+  .classList.add("chat-open");
+
+  fetch(
   "/seen",
   
   {
@@ -497,32 +503,26 @@ function clearUnread(username) {
 
 }
 
-  document.getElementById(
-    "chatName"
-  ).innerText = user;
+
 
   // NEW CODE START
-  const profileRes =
-    await fetch(`/profile/${user}`);
+  fetch(`/profile/${user}`)
+.then(res => res.json())
+.then(profileData => {
 
-  const profileData =
-    await profileRes.json();
+    if(profileData.ok){
 
-  if(profileData.ok){
+        document.getElementById("chatAvatar").src =
+        profileData.profilePic ||
+        "https://ui-avatars.com/api/?name=" +
+        encodeURIComponent(user);
 
-    document.getElementById(
-      "chatAvatar"
-    ).src =
-    profileData.profilePic ||
-    "https://ui-avatars.com/api/?name=" +
-    encodeURIComponent(user);
+    }
 
-  }
+});
   // NEW CODE END
 
-  document
-    .getElementById("app")
-    .classList.add("chat-open");
+
 
   document
     .getElementById("chatStatus")
@@ -531,6 +531,12 @@ function clearUnread(username) {
   onlineUsers.includes(user)
   ? "Online"
   : "Offline";
+
+  messages.innerHTML = `
+  <div class="loadingMessages">
+    Loading...
+  </div>
+`;
 
   const res =
     await fetch(
