@@ -35,11 +35,38 @@ const auth = document.getElementById("auth");
 const app = document.getElementById("app");
 const usersBox = document.getElementById("users");
 const messages = document.getElementById("messages");
-const messageInput = document.getElementById("messageInput");
-let typingTimeout;
 const imageInput = document.getElementById("imageInput");
 const sidebarUsers = {};
 const unreadCounts = {};
+const messageInput =
+document.getElementById("message");
+
+const sendBtn =
+document.getElementById("send");
+
+let typingTimeout;
+
+messageInput.addEventListener("input", () => {
+
+  if (!currentUser) return;
+
+  socket.emit("typing", {
+    from: me,
+    to: currentUser
+  });
+
+  clearTimeout(typingTimeout);
+
+  typingTimeout = setTimeout(() => {
+
+    socket.emit("stop-typing", {
+      from: me,
+      to: currentUser
+    });
+
+  }, 1000);
+
+});
 
 
 

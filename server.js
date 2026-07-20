@@ -447,13 +447,25 @@ socket.on("user-online", username => {
 
 socket.on("typing", (data) => {
 
-  socket.broadcast.emit("typing", data);
+  const targetSocket = onlineUsers[data.to];
+
+  if (targetSocket) {
+
+    io.to(targetSocket).emit("typing", data);
+
+  }
 
 });
 
 socket.on("stop-typing", (data) => {
 
-  socket.broadcast.emit("stop-typing", data);
+  const targetSocket = onlineUsers[data.to];
+
+  if (targetSocket) {
+
+    io.to(targetSocket).emit("stop-typing", data);
+
+  }
 
 });
 socket.on("user-online", username => {
