@@ -38,11 +38,7 @@ const messages = document.getElementById("messages");
 const imageInput = document.getElementById("imageInput");
 const sidebarUsers = {};
 const unreadCounts = {};
-const messageInput =
-document.getElementById("message");
-
-const sendBtn =
-document.getElementById("send");
+const messageInput = document.getElementById("messageInput");
 
 let typingTimeout;
 
@@ -67,7 +63,6 @@ messageInput.addEventListener("input", () => {
   }, 1000);
 
 });
-
 
 
 window.onload = () => {
