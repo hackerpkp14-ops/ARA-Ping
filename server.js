@@ -446,6 +446,7 @@ socket.on("user-online", username => {
 
 
 socket.on("typing", (data) => {
+  console.log("SERVER RECEIVED:", data);
 
   const targetSocket = onlineUsers[data.to];
 

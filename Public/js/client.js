@@ -44,6 +44,8 @@ let typingTimeout;
 
 messageInput.addEventListener("input", () => {
 
+  console.log("EMITTING TYPING");
+
   if (!currentUser) return;
 
   socket.emit("typing", {
@@ -792,11 +794,13 @@ socket.on("message", (data) => {
 });
 socket.on("typing", (data) => {
 
-  const targetSocket = onlineUsers[data.to];
+  if (
+    data.from === currentUser &&
+    data.to === me
+  ) {
 
-  if (targetSocket) {
-
-    io.to(targetSocket).emit("typing", data);
+    document.getElementById("chatStatus").innerText =
+      "Typing...";
 
   }
 
@@ -804,11 +808,15 @@ socket.on("typing", (data) => {
 
 socket.on("stop-typing", (data) => {
 
-  const targetSocket = onlineUsers[data.to];
+  if (
+    data.from === currentUser &&
+    data.to === me
+  ) {
 
-  if (targetSocket) {
-
-    io.to(targetSocket).emit("stop-typing", data);
+    document.getElementById("chatStatus").innerText =
+      onlineUsers.includes(currentUser)
+        ? "Online"
+        : "Offline";
 
   }
 
