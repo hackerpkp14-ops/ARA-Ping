@@ -24,6 +24,10 @@ if(currentUser){
   )
   ? "Online"
   : "Offline";
+  console.log(
+  "Status after openChat:",
+  document.getElementById("chatStatus").innerText
+);
 
 }
 

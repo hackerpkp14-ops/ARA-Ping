@@ -452,6 +452,17 @@ socket.on("stop-typing", (data) => {
   socket.broadcast.emit("stop-typing", data);
 
 });
+socket.on("user-online", username => {
+
+  console.log("USER ONLINE:", username);
+
+  onlineUsers[username] = socket.id;
+
+  console.log("ONLINE USERS:", Object.keys(onlineUsers));
+
+  io.emit("online-users", Object.keys(onlineUsers));
+
+});
 
 socket.on(
 "message",
