@@ -338,7 +338,10 @@ function updateSidebarUser(user) {
 
   }
 
+  // Move only when a new message arrives
+if (user.lastMessage || user.text || user.lastTime) {
   moveUserToTop(user.username);
+}
 
 }
 
@@ -476,13 +479,23 @@ async function openChat(user) {
 );
 unreadCounts[user] = 0;
 
-updateSidebarUser({
+clearUnread(user);
 
-  username: user,
+function clearUnread(username) {
 
-  unread: 0
+  const div = sidebarUsers[username];
 
-});
+  if (!div) return;
+
+  const badge = div.querySelector(".unreadBadge");
+
+  if (badge) {
+    badge.remove();
+  }
+
+  unreadCounts[username] = 0;
+
+}
 
   document.getElementById(
     "chatName"
