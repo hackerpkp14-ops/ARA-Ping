@@ -24,10 +24,7 @@ if(currentUser){
   )
   ? "Online"
   : "Offline";
-  console.log(
-  "Status after openChat:",
-  document.getElementById("chatStatus").innerText
-);
+
 
 }
 
@@ -529,19 +526,19 @@ function clearUnread(username) {
 
 
 
-  document
-    .getElementById("chatStatus")
-    .innerText =
+  console.log("USER:", user);
+console.log("ONLINE USERS:", onlineUsers);
+console.log("INCLUDES:", onlineUsers.includes(user));
 
+document.getElementById("chatStatus").innerText =
   onlineUsers.includes(user)
-  ? "Online"
-  : "Offline";
+    ? "Online"
+    : "Offline";
 
-  messages.innerHTML = `
-  <div class="loadingMessages">
-    Loading...
-  </div>
-`;
+console.log(
+  "Status after openChat:",
+  document.getElementById("chatStatus").innerText
+);
 
   const res =
     await fetch(
