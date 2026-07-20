@@ -430,16 +430,20 @@ io.on("connection", socket => {
 
 socket.on("user-online", username => {
 
+  console.log("USER ONLINE:", username);
 
-onlineUsers[username] = socket.id;
+  onlineUsers[username] = socket.id;
 
-io.emit(
-  "online-users",
-  Object.keys(onlineUsers)
-);
+  console.log("ALL ONLINE USERS:", Object.keys(onlineUsers));
 
+  io.emit(
+    "online-users",
+    Object.keys(onlineUsers)
+  );
 
 });
+
+
 
 socket.on("typing", (data) => {
 
