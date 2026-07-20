@@ -441,6 +441,18 @@ io.emit(
 
 });
 
+socket.on("typing", (data) => {
+
+  socket.broadcast.emit("typing", data);
+
+});
+
+socket.on("stop-typing", (data) => {
+
+  socket.broadcast.emit("stop-typing", data);
+
+});
+
 socket.on(
 "message",
 async data => {
@@ -552,17 +564,7 @@ app.post(
 
   }
 );
-socket.on("typing", (data) => {
 
-  socket.broadcast.emit("typing", data);
-
-});
-
-socket.on("stop-typing", (data) => {
-
-  socket.broadcast.emit("stop-typing", data);
-
-});
 
 /* ======================
    SERVER
