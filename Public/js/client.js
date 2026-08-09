@@ -590,35 +590,43 @@ console.log(
 
 // RENDER MESSAGE
 
-function renderMessage(m){
+function renderMessage(m) {
 
   const div =
-  document.createElement("div");
+    document.createElement("div");
 
   div.className = "msg";
 
-  if(m.from === me){
+  if (m.from === me) {
     div.classList.add("mine");
   }
 
   const time =
-  new Date(m.createdAt)
-  .toLocaleTimeString([],{
-    hour:"2-digit",
-    minute:"2-digit"
-  });
+    new Date(m.createdAt)
+      .toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+
+  const tick =
+    m.from === me
+      ? `<span class="messageTick">✓</span>`
+      : "";
 
   div.innerHTML = `
-    ${m.text ? `<div>${m.text}</div>` : ""}
-    ${m.image ? `<img src="${m.image}">` : ""}
-    <span class="time">${time}</span>
+    ${m.text ? m.text : ""}
+    ${m.image ? `` : ""}
+
+    <span class="time">
+      ${time}
+      ${tick}
+    </span>
   `;
 
   messages.appendChild(div);
 
   messages.scrollTop =
-  messages.scrollHeight;
-
+    messages.scrollHeight;
 }
 
 // SEND MESSAGE
