@@ -746,6 +746,8 @@ imageInput.addEventListener(
 
 socket.on("message", (data) => {
 
+  console.log("SOCKET MESSAGE RECEIVED:", data);
+
   if (
 
     (
