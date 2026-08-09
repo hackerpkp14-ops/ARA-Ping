@@ -681,14 +681,7 @@ messageInput.addEventListener("input", () => {
   }, 1000);
 
 });
-socket.on("message-delivered", data => {
 
-  console.log(
-    "MESSAGE DELIVERED:",
-    data
-  );
-
-});
 
 // ENTER KEY
 
