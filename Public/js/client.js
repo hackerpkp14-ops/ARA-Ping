@@ -748,23 +748,33 @@ socket.on("message", (data) => {
 
   console.log("SOCKET MESSAGE RECEIVED:", data);
 
-  if (
+  const isCurrentChat =
+  (
+    data.from === currentUser &&
+    data.to === me
+  ) ||
+  (
+    data.from === me &&
+    data.to === currentUser
+  );
 
-    (
-      data.from === currentUser &&
-      data.to === me
-    ) ||
+console.log("CURRENT USER:", currentUser);
+console.log("ME:", me);
+console.log("FROM:", data.from);
+console.log("TO:", data.to);
+console.log("IS CURRENT CHAT:", isCurrentChat);
 
-    (
-      data.from === me &&
-      data.to === currentUser
-    )
+if (isCurrentChat) {
 
-  ) {
+  console.log("RENDERING MESSAGE NOW");
 
-    renderMessage(data);
+  renderMessage(data);
 
-  }
+} else {
+
+  console.log("NOT RENDERING — DIFFERENT CHAT");
+
+}
 
   const other =
 
