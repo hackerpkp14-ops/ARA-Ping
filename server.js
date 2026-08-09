@@ -503,31 +503,69 @@ socket.on("message", async data => {
 
     });
 
-    // Send message to sender
-    socket.emit("message", saved);
+    console.log(
+      "MESSAGE SAVED:",
+      saved._id.toString()
+    );
 
-    // Send message to recipient if online
     const targetSocket =
       onlineUsers[data.to];
 
+    console.log(
+      "DELIVERY CHECK:",
+      {
+        from: data.from,
+        to: data.to,
+        targetSocket,
+        onlineUsers
+      }
+    );
+
+    // Send the saved message back to sender
+    socket.emit(
+      "message",
+      saved
+    );
+
+    // Send message to recipient
     if (targetSocket) {
 
-      io.to(targetSocket).emit(
+      io.to(
+        targetSocket
+      ).emit(
         "message",
         saved
       );
 
-      // Tell sender the message was delivered
-      socket.emit("message-delivered", {
-        messageId: saved._id,
-        to: data.to
-      });
+      console.log(
+        "SENDING DELIVERY CONFIRMATION"
+      );
+
+      socket.emit(
+        "message-delivered",
+        {
+          messageId:
+            saved._id.toString(),
+
+          to: data.to
+        }
+      );
+
+    } else {
+
+      console.log(
+        "RECIPIENT OFFLINE:",
+        data.to
+      );
 
     }
 
   } catch (err) {
 
-    console.log(err);
+    console.log(
+      "MESSAGE ERROR:",
+      err
+    );
 
   }
 
