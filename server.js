@@ -428,185 +428,228 @@ const onlineUsers = {};
 
 io.on("connection", socket => {
 
-socket.on("user-online", username => {
+  // =========================
+  // USER ONLINE
+  // =========================
 
-  console.log("USER ONLINE:", username);
-
-  onlineUsers[username] = socket.id;
-
-  console.log("ALL ONLINE USERS:", Object.keys(onlineUsers));
-
-  io.emit(
-    "online-users",
-    Object.keys(onlineUsers)
-  );
-
-});
-
-
-
-socket.on("typing", (data) => {
-  console.log("SERVER RECEIVED:", data);
-
-  const targetSocket =
-  onlineUsers[data.to];
-
-if (targetSocket) {
-
-  io.to(targetSocket).emit(
-    "message",
-    saved
-  );
-  
-  socket.emit("message-delivered", {
-    messageId: saved._id,
-    to: data.to
-  });
-
-}
-});
-
-socket.on("stop-typing", (data) => {
-
-  const targetSocket = onlineUsers[data.to];
-
-  if (targetSocket) {
-
-    io.to(targetSocket).emit("stop-typing", data);
-
-  }
-
-});
-socket.on("user-online", username => {
-
-  console.log("USER ONLINE:", username);
-
-  onlineUsers[username] = socket.id;
-
-  console.log("ONLINE USERS:", Object.keys(onlineUsers));
-
-  io.emit("online-users", Object.keys(onlineUsers));
-
-});
-
-socket.on("message", async data => {
-
-  try {
-
-    const saved = await Message.create({
-
-      from: data.from,
-      to: data.to,
-      text: data.text || "",
-      image: data.image || "",
-      seen: false
-
-    });
+  socket.on("user-online", username => {
 
     console.log(
-      "MESSAGE SAVED:",
-      saved._id.toString()
+      "USER ONLINE:",
+      username,
+      socket.id
+    );
+
+    onlineUsers[username] =
+      socket.id;
+
+    console.log(
+      "ALL ONLINE USERS:",
+      Object.keys(onlineUsers)
+    );
+
+    io.emit(
+      "online-users",
+      Object.keys(onlineUsers)
+    );
+
+  });
+
+
+  // =========================
+  // TYPING
+  // =========================
+
+  socket.on("typing", data => {
+
+    console.log(
+      "SERVER RECEIVED:",
+      data
     );
 
     const targetSocket =
       onlineUsers[data.to];
 
-    console.log(
-      "DELIVERY CHECK:",
-      {
-        from: data.from,
-        to: data.to,
-        targetSocket,
-        onlineUsers
-      }
-    );
-
-    // Send the saved message back to sender
-    socket.emit(
-      "message",
-      saved
-    );
-
-    // Send message to recipient
     if (targetSocket) {
 
-      io.to(
-        targetSocket
-      ).emit(
+      io.to(targetSocket).emit(
+        "typing",
+        data
+      );
+
+    }
+
+  });
+
+
+  // =========================
+  // STOP TYPING
+  // =========================
+
+  socket.on("stop-typing", data => {
+
+    const targetSocket =
+      onlineUsers[data.to];
+
+    if (targetSocket) {
+
+      io.to(targetSocket).emit(
+        "stop-typing",
+        data
+      );
+
+    }
+
+  });
+
+
+  // =========================
+  // MESSAGE
+  // =========================
+
+  socket.on("message", async data => {
+
+    try {
+
+      const saved =
+        await Message.create({
+
+          from: data.from,
+
+          to: data.to,
+
+          text: data.text || "",
+
+          image: data.image || "",
+
+          seen: false
+
+        });
+
+
+      console.log(
+        "MESSAGE SAVED:",
+        saved._id.toString()
+      );
+
+
+      const targetSocket =
+        onlineUsers[data.to];
+
+
+      console.log(
+        "DELIVERY CHECK:",
+        {
+          from: data.from,
+
+          to: data.to,
+
+          targetSocket,
+
+          onlineUsers
+        }
+      );
+
+
+      // Send saved message back
+      // to the sender
+
+      socket.emit(
         "message",
         saved
       );
 
+
+      // Send message to recipient
+
+      if (targetSocket) {
+
+        io.to(targetSocket).emit(
+          "message",
+          saved
+        );
+
+
+        console.log(
+          "SENDING DELIVERY CONFIRMATION"
+        );
+
+
+        socket.emit(
+          "message-delivered",
+          {
+
+            messageId:
+              saved._id.toString(),
+
+            to: data.to
+
+          }
+        );
+
+
+      } else {
+
+        console.log(
+          "RECIPIENT OFFLINE:",
+          data.to
+        );
+
+      }
+
+
+    } catch (err) {
+
       console.log(
-        "SENDING DELIVERY CONFIRMATION"
-      );
-
-      socket.emit(
-        "message-delivered",
-        {
-          messageId:
-            saved._id.toString(),
-
-          to: data.to
-        }
-      );
-
-    } else {
-
-      console.log(
-        "RECIPIENT OFFLINE:",
-        data.to
+        "MESSAGE ERROR:",
+        err
       );
 
     }
 
-  } catch (err) {
+  });
 
-    console.log(
-      "MESSAGE ERROR:",
-      err
+
+  // =========================
+  // DISCONNECT
+  // =========================
+
+  socket.on("disconnect", () => {
+
+    for (
+      const username
+      in onlineUsers
+    ) {
+
+      if (
+        onlineUsers[username] ===
+        socket.id
+      ) {
+
+        delete onlineUsers[
+          username
+        ];
+
+        console.log(
+          "USER OFFLINE:",
+          username
+        );
+
+        break;
+
+      }
+
+    }
+
+
+    io.emit(
+      "online-users",
+      Object.keys(
+        onlineUsers
+      )
     );
 
-  }
-
-});
-
-socket.on(
-"disconnect",
-() => {
-
-
-  for(
-    const username
-    in onlineUsers
-  ){
-
-    if(
-      onlineUsers[username]
-      === socket.id
-    ){
-
-      delete onlineUsers[
-        username
-      ];
-
-      break;
-
-    }
-
-  }
-
-  io.emit(
-    "online-users",
-    Object.keys(
-      onlineUsers
-    )
-  );
-
-}
-
-
-);
+  });
 
 });
 
