@@ -448,14 +448,8 @@ socket.on("user-online", username => {
 socket.on("typing", (data) => {
   console.log("SERVER RECEIVED:", data);
 
-  const targetSocket = onlineUsers[data.to];
-
-console.log("DELIVERY CHECK:", {
-  sender: data.from,
-  recipient: data.to,
-  targetSocket,
-  onlineUsers
-});
+  const targetSocket =
+  onlineUsers[data.to];
 
 if (targetSocket) {
 
@@ -463,23 +457,13 @@ if (targetSocket) {
     "message",
     saved
   );
-
-  console.log("SENDING DELIVERY CONFIRMATION");
-
+  
   socket.emit("message-delivered", {
-    messageId: saved._id.toString(),
+    messageId: saved._id,
     to: data.to
   });
 
-} else {
-
-  console.log(
-    "RECIPIENT IS OFFLINE:",
-    data.to
-  );
-
 }
-
 });
 
 socket.on("stop-typing", (data) => {
