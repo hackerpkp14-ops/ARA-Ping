@@ -481,41 +481,49 @@ socket.on("user-online", username => {
 
 });
 
-socket.on(
-"message",
-async data => {
-
+socket.on("message", async data => {
 
   try {
 
-    const saved =
-await Message.create({
+    const saved = await Message.create({
 
-  from: data.from,
-  to: data.to,
-  text: data.text || "",
-  image: data.image || "",
+      from: data.from,
+      to: data.to,
+      text: data.text || "",
+      image: data.image || "",
+      seen: false
 
-  // NEW
-  seen: false
+    });
 
-});
+    // Send message to sender
+    socket.emit("message", saved);
 
-    io.emit(
-      "message",
-      saved
-    );
+    // Send message to recipient if online
+    const targetSocket =
+      onlineUsers[data.to];
 
-  } catch(err){
+    if (targetSocket) {
+
+      io.to(targetSocket).emit(
+        "message",
+        saved
+      );
+
+      // Tell sender the message was delivered
+      socket.emit("message-delivered", {
+        messageId: saved._id,
+        to: data.to
+      });
+
+    }
+
+  } catch (err) {
 
     console.log(err);
 
   }
 
-}
-
-
-);
+});
 
 socket.on(
 "disconnect",
