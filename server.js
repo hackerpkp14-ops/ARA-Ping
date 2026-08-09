@@ -450,11 +450,35 @@ socket.on("typing", (data) => {
 
   const targetSocket = onlineUsers[data.to];
 
-  if (targetSocket) {
+console.log("DELIVERY CHECK:", {
+  sender: data.from,
+  recipient: data.to,
+  targetSocket,
+  onlineUsers
+});
 
-    io.to(targetSocket).emit("typing", data);
+if (targetSocket) {
 
-  }
+  io.to(targetSocket).emit(
+    "message",
+    saved
+  );
+
+  console.log("SENDING DELIVERY CONFIRMATION");
+
+  socket.emit("message-delivered", {
+    messageId: saved._id.toString(),
+    to: data.to
+  });
+
+} else {
+
+  console.log(
+    "RECIPIENT IS OFFLINE:",
+    data.to
+  );
+
+}
 
 });
 
