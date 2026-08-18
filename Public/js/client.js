@@ -921,6 +921,55 @@ socket.on("stop-typing", (data) => {
   }
 
 });
+socket.on("message-reaction", (data) => {
+
+  console.log(
+    "REACTION RECEIVED:",
+    data
+  );
+
+  const message =
+    document.querySelector(
+      `.msg[data-message-id="${data.messageId}"]`
+    );
+
+  if (!message) return;
+
+  const reactions =
+    message.querySelector(".reactions");
+
+  if (!reactions) return;
+
+
+  let reactionData =
+    reactions.dataset.reactions
+      ? JSON.parse(
+          reactions.dataset.reactions
+        )
+      : {};
+
+
+  if (data.reaction) {
+
+    reactionData[data.username] =
+      data.reaction;
+
+  } else {
+
+    delete reactionData[data.username];
+
+  }
+
+
+  reactions.dataset.reactions =
+    JSON.stringify(reactionData);
+
+
+  reactions.innerText =
+    Object.values(reactionData)
+      .join(" ");
+
+});
 
 // MOBILE BACK
 
