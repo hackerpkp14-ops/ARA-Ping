@@ -508,6 +508,86 @@ io.on("connection", socket => {
 
   });
 
+  // =========================
+// MESSAGE REACTION
+// =========================
+
+socket.on("react-message", async data => {
+
+  try {
+
+    const {
+      messageId,
+      username,
+      reaction
+    } = data;
+
+    const message =
+      await Message.findById(messageId);
+
+    if (!message) {
+
+      console.log(
+        "REACTION ERROR: MESSAGE NOT FOUND"
+      );
+
+      return;
+
+    }
+
+    // Set or change reaction
+    if (reaction) {
+
+      message.reactions.set(
+        username,
+        reaction
+      );
+
+    } else {
+
+      // Remove reaction
+      message.reactions.delete(
+        username
+      );
+
+    }
+
+    await message.save();
+
+
+    console.log(
+      "REACTION UPDATED:",
+      {
+        messageId,
+        username,
+        reaction
+      }
+    );
+
+
+    // Send updated reaction to everyone
+    io.emit("message-reaction", {
+
+      messageId,
+
+      username,
+
+      reaction
+
+    });
+
+
+  } catch (err) {
+
+    console.log(
+      "REACTION ERROR:",
+      err
+    );
+
+  }
+
+});
+
 
   // =========================
   // MESSAGE
