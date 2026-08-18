@@ -609,12 +609,12 @@ function renderMessage(m) {
       });
 
   const tick =
-    m.from === me
-      ? `<span
-          class="messageTick"
-          data-message-id="${m._id || ""}"
-        >✓</span>`
-      : "";
+  m.from === me
+    ? `<span
+        class="messageTick"
+        data-message-id="${m._id || ""}"
+      >${m.seen ? "✓✓" : "✓"}</span>`
+    : "";
 
   div.innerHTML = `
     ${m.text ? m.text : ""}
