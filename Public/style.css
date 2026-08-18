@@ -697,3 +697,6 @@ body{
   margin-left: 4px;
   font-size: 12px;
 }
+.messageTick.seen {
+  color: #2196f3;
+}

@@ -653,42 +653,55 @@ io.on("connection", socket => {
 
 });
 
-app.post(
-  "/seen",
-  async (req, res) => {
+app.post("/seen", async (req, res) => {
 
-    try {
+  try {
 
-      await Message.updateMany(
+    const from = req.body.from;
+    const to = req.body.to;
 
+    const result = await Message.updateMany(
+      {
+        from: from,
+        to: to,
+        seen: false
+      },
+      {
+        seen: true
+      }
+    );
+
+    // Tell the sender that their messages were seen
+    const senderSocket =
+      onlineUsers[from];
+
+    if (senderSocket) {
+
+      io.to(senderSocket).emit(
+        "messages-seen",
         {
-          from: req.body.from,
-          to: req.body.to,
-          seen: false
-        },
-
-        {
-          seen: true
+          from: from,
+          to: to
         }
-
       );
-
-      res.json({
-        ok: true
-      });
-
-    } catch (err) {
-
-      console.log(err);
-
-      res.status(500).json({
-        ok: false
-      });
 
     }
 
+    res.json({
+      ok: true
+    });
+
+  } catch (err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      ok: false
+    });
+
   }
-);
+
+});
 
 
 /* ======================

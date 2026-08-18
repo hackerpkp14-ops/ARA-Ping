@@ -829,6 +829,27 @@ socket.on("message-delivered", data => {
   }
 
 });
+socket.on("messages-seen", data => {
+
+  console.log(
+    "MESSAGES SEEN:",
+    data
+  );
+
+  const sentMessages =
+    document.querySelectorAll(
+      `.msg.mine .messageTick`
+    );
+
+  sentMessages.forEach(tick => {
+
+    tick.innerText = "✓✓";
+
+    tick.classList.add("seen");
+
+  });
+
+});
 socket.on("typing", (data) => {
 
   if (
