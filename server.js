@@ -660,7 +660,17 @@ app.post("/seen", async (req, res) => {
     const from = req.body.from;
     const to = req.body.to;
 
-    const result = await Message.updateMany(
+    const messages = await Message.find({
+      from: from,
+      to: to,
+      seen: false
+    });
+
+    const messageIds = messages.map(
+      m => m._id.toString()
+    );
+
+    await Message.updateMany(
       {
         from: from,
         to: to,
@@ -671,28 +681,22 @@ app.post("/seen", async (req, res) => {
       }
     );
 
-    // Tell the sender that their messages were seen
     const senderSocket =
       onlineUsers[from];
-      console.log("SENDING SEEN EVENT:", {
+
+    console.log("SEEN UPDATE:", {
       from,
       to,
+      messageIds,
       senderSocket
-});
-     console.log("SEEN ROUTING:", {
-     from,
-     to,
-    senderSocket,
-    onlineUsers
-});
+    });
 
-    if (senderSocket) {
+    if (senderSocket && messageIds.length > 0) {
 
       io.to(senderSocket).emit(
         "messages-seen",
         {
-          from: from,
-          to: to
+          messageIds
         }
       );
 
@@ -704,7 +708,10 @@ app.post("/seen", async (req, res) => {
 
   } catch (err) {
 
-    console.log(err);
+    console.log(
+      "SEEN ERROR:",
+      err
+    );
 
     res.status(500).json({
       ok: false

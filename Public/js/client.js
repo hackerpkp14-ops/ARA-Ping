@@ -836,32 +836,22 @@ socket.on("messages-seen", data => {
     data
   );
 
-  // Only update ticks when this event
-  // belongs to the currently open chat.
+  if (!data.messageIds) return;
 
-  if (
-    data.from !== me ||
-    data.to !== currentUser
-  ) {
+  data.messageIds.forEach(id => {
 
-    console.log(
-      "IGNORING SEEN EVENT — DIFFERENT CHAT"
-    );
+    const tick =
+      document.querySelector(
+        `.messageTick[data-message-id="${id}"]`
+      );
 
-    return;
+    if (tick) {
 
-  }
+      tick.innerText = "✓✓";
 
-  const sentMessages =
-    document.querySelectorAll(
-      ".msg.mine .messageTick"
-    );
+      tick.classList.add("seen");
 
-  sentMessages.forEach(tick => {
-
-    tick.innerText = "✓✓";
-
-    tick.classList.add("seen");
+    }
 
   });
 
