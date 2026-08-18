@@ -617,6 +617,8 @@ function renderMessage(m) {
     : "";
 
   div.innerHTML = `
+  <div class="messageContent">
+
     ${m.text ? m.text : ""}
     ${m.image ? `` : ""}
 
@@ -624,7 +626,67 @@ function renderMessage(m) {
       ${time}
       ${tick}
     </span>
-  `;
+
+  </div>
+
+  <button
+    class="reactionBtn"
+    title="React"
+  >
+    😊
+  </button>
+
+  <div class="reactionMenu">
+
+    <button data-reaction="❤️">❤️</button>
+    <button data-reaction="😂">😂</button>
+    <button data-reaction="👍">👍</button>
+    <button data-reaction="😮">😮</button>
+    <button data-reaction="😢">😢</button>
+    <button data-reaction="🔥">🔥</button>
+
+  </div>
+
+  <div class="reactions"></div>
+`;
+const reactionBtn =
+  div.querySelector(".reactionBtn");
+
+const reactionMenu =
+  div.querySelector(".reactionMenu");
+
+reactionBtn.onclick = (e) => {
+
+  e.stopPropagation();
+
+  reactionMenu.classList.toggle("show");
+
+};
+reactionMenu
+  .querySelectorAll("button")
+  .forEach(button => {
+
+    button.onclick = () => {
+
+      const reaction =
+        button.dataset.reaction;
+
+      socket.emit(
+        "react-message",
+        {
+          messageId: m._id,
+          username: me,
+          reaction
+        }
+      );
+
+      reactionMenu.classList.remove(
+        "show"
+      );
+
+    };
+
+  });
 
   messages.appendChild(div);
 
