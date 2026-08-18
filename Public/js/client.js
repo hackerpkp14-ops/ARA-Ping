@@ -1162,15 +1162,46 @@ document.addEventListener(
 
     }
 
-    reactionMenu.style.left =
-      `${e.clientX}px`;
+    reactionMenu.classList.add("show");
 
-    reactionMenu.style.top =
-      `${e.clientY}px`;
+const menuWidth =
+  reactionMenu.offsetWidth;
 
-    reactionMenu.classList.add(
-      "show"
-    );
+const menuHeight =
+  reactionMenu.offsetHeight;
+
+let x = e.clientX;
+let y = e.clientY;
+
+if (
+  x + menuWidth >
+  window.innerWidth
+) {
+
+  x =
+    window.innerWidth -
+    menuWidth -
+    10;
+
+}
+
+if (
+  y + menuHeight >
+  window.innerHeight
+) {
+
+  y =
+    window.innerHeight -
+    menuHeight -
+    10;
+
+}
+
+reactionMenu.style.left =
+  `${Math.max(10, x)}px`;
+
+reactionMenu.style.top =
+  `${Math.max(10, y)}px`;
 
   }
 );
