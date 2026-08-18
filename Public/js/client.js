@@ -752,38 +752,63 @@ socket.on("message", (data) => {
   console.log("SOCKET MESSAGE RECEIVED:", data);
 
   const isCurrentChat =
-  (
-    data.from === currentUser &&
-    data.to === me
-  ) ||
-  (
-    data.from === me &&
-    data.to === currentUser
-  );
+    (
+      data.from === currentUser &&
+      data.to === me
+    ) ||
+    (
+      data.from === me &&
+      data.to === currentUser
+    );
 
-console.log("CURRENT USER:", currentUser);
-console.log("ME:", me);
-console.log("FROM:", data.from);
-console.log("TO:", data.to);
-console.log("IS CURRENT CHAT:", isCurrentChat);
+  console.log("CURRENT USER:", currentUser);
+  console.log("ME:", me);
+  console.log("FROM:", data.from);
+  console.log("TO:", data.to);
+  console.log("IS CURRENT CHAT:", isCurrentChat);
 
-if (isCurrentChat) {
 
-  console.log("RENDERING MESSAGE NOW");
+  if (isCurrentChat) {
 
-  renderMessage(data);
+    console.log("RENDERING MESSAGE NOW");
 
-} else {
+    renderMessage(data);
 
-  console.log("NOT RENDERING — DIFFERENT CHAT");
+    // If the chat is already open,
+    // mark the incoming message as seen.
+    if (data.to === me) {
 
-}
+      fetch("/seen", {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          from: data.from,
+          to: me
+        })
+
+      });
+
+    }
+
+  } else {
+
+    console.log(
+      "NOT RENDERING — DIFFERENT CHAT"
+    );
+
+  }
+
 
   const other =
-
     data.from === me
       ? data.to
       : data.from;
+
 
   const chatData = {
 
@@ -803,7 +828,10 @@ if (isCurrentChat) {
 
   };
 
-  unreadCounts[other] = chatData.unread;
+
+  unreadCounts[other] =
+    chatData.unread;
+
 
   if (sidebarUsers[other]) {
 
