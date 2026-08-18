@@ -674,6 +674,11 @@ app.post("/seen", async (req, res) => {
     // Tell the sender that their messages were seen
     const senderSocket =
       onlineUsers[from];
+      console.log("SENDING SEEN EVENT:", {
+      from,
+      to,
+      senderSocket
+});
 
     if (senderSocket) {
 

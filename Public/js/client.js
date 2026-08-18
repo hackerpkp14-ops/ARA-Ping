@@ -489,9 +489,8 @@ document
   .getElementById("app")
   .classList.add("chat-open");
 
-  fetch(
+  const seenRes = await fetch(
   "/seen",
-  
   {
     method: "POST",
 
@@ -500,14 +499,15 @@ document
     },
 
     body: JSON.stringify({
-
       from: user,
-
       to: me
-
     })
-
   }
+);
+
+console.log(
+  "SEEN REQUEST STATUS:",
+  seenRes.status
 );
 unreadCounts[user] = 0;
 
