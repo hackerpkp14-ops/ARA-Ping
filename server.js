@@ -73,6 +73,12 @@ const MessageSchema = new mongoose.Schema({
     default: false
   },
 
+  reactions: {
+  type: Map,
+  of: String,
+  default: {}
+},
+
   createdAt: {
     type: Date,
     default: Date.now
