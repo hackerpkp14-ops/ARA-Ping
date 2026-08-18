@@ -679,6 +679,12 @@ app.post("/seen", async (req, res) => {
       to,
       senderSocket
 });
+     console.log("SEEN ROUTING:", {
+     from,
+     to,
+    senderSocket,
+    onlineUsers
+});
 
     if (senderSocket) {
 
