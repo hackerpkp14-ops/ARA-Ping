@@ -616,6 +616,23 @@ function renderMessage(m) {
         data-message-id="${m._id || ""}"
       >${m.seen ? "✓✓" : "✓"}</span>`
     : "";
+    let savedReactions = {};
+
+if (m.reactions) {
+
+  if (m.reactions instanceof Map) {
+
+    savedReactions =
+      Object.fromEntries(m.reactions);
+
+  } else {
+
+    savedReactions =
+      m.reactions;
+
+  }
+
+}
 
   div.innerHTML = `
   <div class="messageContent">
@@ -630,7 +647,12 @@ function renderMessage(m) {
 
   </div>
 
-  <div class="reactions"></div>
+  <div
+  class="reactions"
+  data-reactions='${JSON.stringify(savedReactions)}'
+>
+  ${Object.values(savedReactions).join(" ")}
+</div>
 `;
 
 
