@@ -703,60 +703,46 @@ body{
 .msg {
   position: relative;
 }
-
-.reactionBtn {
-  display: none;
-  position: absolute;
-  right: -35px;
-  top: 0;
-
-  border: none;
-  background: transparent;
-
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.msg:hover .reactionBtn {
-  display: block;
-}
-
-.reactionMenu {
+#reactionMenu {
   display: none;
 
-  position: absolute;
-  right: -190px;
-  top: -5px;
+  position: fixed;
 
   background: white;
-  border-radius: 20px;
-  padding: 5px;
 
-  box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+  border-radius: 25px;
 
-  z-index: 100;
+  padding: 6px 8px;
+
+  box-shadow:
+    0 4px 18px rgba(0,0,0,0.25);
+
+  z-index: 9999;
+
+  gap: 4px;
 }
 
-.reactionMenu.show {
+#reactionMenu.show {
   display: flex;
-  gap: 3px;
 }
 
-.reactionMenu button {
+#reactionMenu button {
   border: none;
+
   background: transparent;
 
+  font-size: 22px;
+
   cursor: pointer;
-  font-size: 20px;
 
-  padding: 4px;
+  padding: 5px;
+
+  border-radius: 50%;
+
+  transition:
+    transform 0.15s ease;
 }
 
-.reactionMenu button:hover {
-  transform: scale(1.2);
-}
-
-.reactions {
-  margin-top: 3px;
-  font-size: 14px;
+#reactionMenu button:hover {
+  transform: scale(1.25);
 }

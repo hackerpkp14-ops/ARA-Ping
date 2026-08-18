@@ -596,6 +596,7 @@ function renderMessage(m) {
     document.createElement("div");
 
   div.className = "msg";
+  div.dataset.messageId = m._id;
 
   if (m.from === me) {
     div.classList.add("mine");
@@ -629,64 +630,9 @@ function renderMessage(m) {
 
   </div>
 
-  <button
-    class="reactionBtn"
-    title="React"
-  >
-    😊
-  </button>
-
-  <div class="reactionMenu">
-
-    <button data-reaction="❤️">❤️</button>
-    <button data-reaction="😂">😂</button>
-    <button data-reaction="👍">👍</button>
-    <button data-reaction="😮">😮</button>
-    <button data-reaction="😢">😢</button>
-    <button data-reaction="🔥">🔥</button>
-
-  </div>
-
   <div class="reactions"></div>
 `;
-const reactionBtn =
-  div.querySelector(".reactionBtn");
 
-const reactionMenu =
-  div.querySelector(".reactionMenu");
-
-reactionBtn.onclick = (e) => {
-
-  e.stopPropagation();
-
-  reactionMenu.classList.toggle("show");
-
-};
-reactionMenu
-  .querySelectorAll("button")
-  .forEach(button => {
-
-    button.onclick = () => {
-
-      const reaction =
-        button.dataset.reaction;
-
-      socket.emit(
-        "react-message",
-        {
-          messageId: m._id,
-          username: me,
-          reaction
-        }
-      );
-
-      reactionMenu.classList.remove(
-        "show"
-      );
-
-    };
-
-  });
 
   messages.appendChild(div);
 
@@ -1171,4 +1117,137 @@ async () => {
 );
 
 }
+const reactionMenu =
+  document.createElement("div");
 
+reactionMenu.id = "reactionMenu";
+
+reactionMenu.innerHTML = `
+  <button data-reaction="❤️">❤️</button>
+  <button data-reaction="😂">😂</button>
+  <button data-reaction="👍">👍</button>
+  <button data-reaction="😮">😮</button>
+  <button data-reaction="😢">😢</button>
+  <button data-reaction="🔥">🔥</button>
+`;
+
+document.body.appendChild(
+  reactionMenu
+);
+
+let reactionMessageId = null;
+
+document.addEventListener(
+  "contextmenu",
+  (e) => {
+
+    const message =
+      e.target.closest(".msg");
+
+    if (!message) return;
+
+    e.preventDefault();
+
+    reactionMessageId =
+      message.querySelector(
+        ".messageTick"
+      )?.dataset.messageId;
+
+    if (!reactionMessageId) {
+
+      // For received messages that don't
+      // have a tick, get the ID another way.
+      reactionMessageId =
+        message.dataset.messageId;
+
+    }
+
+    reactionMenu.style.left =
+      `${e.clientX}px`;
+
+    reactionMenu.style.top =
+      `${e.clientY}px`;
+
+    reactionMenu.classList.add(
+      "show"
+    );
+
+  }
+);
+
+reactionMenu
+  .querySelectorAll("button")
+  .forEach(button => {
+
+    button.onclick = () => {
+
+      if (!reactionMessageId)
+        return;
+
+      socket.emit(
+        "react-message",
+        {
+          messageId:
+            reactionMessageId,
+
+          username: me,
+
+          reaction:
+            button.dataset.reaction
+        }
+      );
+
+      reactionMenu.classList.remove(
+        "show"
+      );
+
+      reactionMessageId = null;
+
+    };
+
+  });
+  let longPressTimer = null;
+
+document.addEventListener(
+  "touchstart",
+  (e) => {
+
+    const message =
+      e.target.closest(".msg");
+
+    if (!message) return;
+
+    longPressTimer =
+      setTimeout(() => {
+
+        reactionMessageId =
+          message.dataset.messageId;
+
+        const rect =
+          message.getBoundingClientRect();
+
+        reactionMenu.style.left =
+          `${rect.left + 20}px`;
+
+        reactionMenu.style.top =
+          `${rect.top - 50}px`;
+
+        reactionMenu.classList.add(
+          "show"
+        );
+
+      }, 600);
+
+  }
+);
+
+document.addEventListener(
+  "touchend",
+  () => {
+
+    clearTimeout(
+      longPressTimer
+    );
+
+  }
+);
