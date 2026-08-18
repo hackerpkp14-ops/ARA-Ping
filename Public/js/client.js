@@ -610,7 +610,10 @@ function renderMessage(m) {
 
   const tick =
     m.from === me
-      ? `<span class="messageTick">✓</span>`
+      ? `<span
+          class="messageTick"
+          data-message-id="${m._id || ""}"
+        >✓</span>`
       : "";
 
   div.innerHTML = `
@@ -810,6 +813,19 @@ if (isCurrentChat) {
 
     loadRecentChats();
 
+  }
+
+});
+socket.on("message-delivered", data => {
+
+  console.log("MESSAGE DELIVERED:", data);
+
+  const tick = document.querySelector(
+    `.messageTick[data-message-id="${data.messageId}"]`
+  );
+
+  if (tick) {
+    tick.innerText = "✓✓";
   }
 
 });
